@@ -6,8 +6,8 @@ import numpy as np
 from decimal import Decimal, getcontext
 import math
 import time
-import benchmark_functions as bf
-from opfunu.cec_based.cec2014 import F12014
+# import benchmark_functions as bf
+# from opfunu.cec_based.cec2014 import F12014
 from Population import Population
 
 #  potem do dodania jak wybierzemy --------------------------------------------------------------------------------
@@ -16,7 +16,7 @@ getcontext().prec = 50
 def get_function(name, ndim):
     """Zwraca wybraną funkcję testową na podstawie jej nazwy."""
     if name == "Hypersphere":
-        return bf.Hypersphere(n_dimensions=ndim)
+        return lambda x: sum(xi ** 2 for xi in x)
     elif name == "Rotated High Conditioned Elliptic Function":
         func = F12014(ndim=ndim)
         return func.evaluate
@@ -125,11 +125,19 @@ def start_algorithm():
     best_select_percent = get_value(best_select_var, 20.0) 
     tournament_size = get_value(tournament_var, 3, int) if selection_method == "Tournament" else None
     cross_method = cross_method_var.get() or "Single Point"
+    cross_probability = get_value(cross_probability_var, 3, int) if cross_method == "Uniform crossover" else None
+
     mutation_method = mutation_method_var.get() or "One Point"
     function_name = function_var.get() or "Rastrigin"
     is_maximization = maximization_var.get() if maximization_var.get() is not None else True
 
-
+    crossover_mapping = {
+        "One-Point": 1,
+        "Two-Point": 2,
+        "Uniform crossover": 3,
+        "Granular crossover": 4
+    }
+    
     func = get_function(function_name, variables_count)
     
     population = Population(variables_count, population_size, precision, start_, end_, func, "max" if is_maximization else "min")
@@ -161,9 +169,13 @@ def start_algorithm():
         # population.individuals =selected_individuals
                 
         # Krzyżowanie
+        crossover_method_number = crossover_mapping.get(cross_method, 1)
+
+        # Wywołanie funkcji
         population.population_after_crossover(
-            crossover_method_number=1 if cross_method == "Single Point" else 2, 
-            crossover_rate=cross_prob
+            crossover_method_number=crossover_method_number, 
+            crossover_rate=cross_prob, 
+            cross_probability=cross_probability
         )
 
         # Mutacja
@@ -223,7 +235,15 @@ def update_tournament_visibility(*args):
     else:
         tournament_label.grid_remove()
         tournament_entry.grid_remove()
-        
+
+def update_ross_probability_visibility(*args):
+    if cross_method_var.get() == "Uniform crossover":
+        cross_probability_label.grid(row=2, column=0, padx=5, pady=2)
+        cross_probability_entry.grid(row=2, column=1, padx=5, pady=2)
+    else:
+        cross_probability_label.grid_remove()
+        cross_probability_entry.grid_remove()
+               
 # Tworzenie głównego okna
 root = tk.Tk()
 root.title("Genetic Algorithm Configuration")
@@ -241,7 +261,11 @@ cross_prob_var = tk.StringVar(value=0.8)
 mutation_prob_var = tk.StringVar(value=0.05)
 inversion_prob_var = tk.StringVar(value=0.01)
 best_select_var = tk.StringVar(value=20.0)
+
 tournament_var = tk.StringVar(value=3)
+
+cross_probability_var = tk.StringVar(value=0.7)
+
 params_var = tk.StringVar(value="10")
 choices = ["10", "20", "30", "50", "100"]
 
@@ -250,6 +274,8 @@ selection_var = tk.StringVar(value="Roulette Wheel")
 selection_var.trace_add("write", update_tournament_visibility)  # Automatyczna reakcja na zmianę
 
 cross_method_var = tk.StringVar(value="One-Point")
+cross_method_var.trace_add("write", update_ross_probability_visibility) 
+
 mutation_method_var = tk.StringVar(value="Boundary")
 function_var = tk.StringVar(value="Hypersphere")
 
@@ -268,7 +294,7 @@ fields = [
     ("Epochs", epochs_var),
     # ("Number of parameters", params_var),
     ("Percentage elite strategy", elite_var),
-    ("Cross probability", cross_prob_var),
+    # ("Cross probability", cross_prob_var),
     ("Mutation probability", mutation_prob_var),
     ("Inversion probability", inversion_prob_var),
 ]
@@ -299,13 +325,30 @@ tournament_entry = tk.Entry(select_frame1, textvariable=tournament_var, width=15
 
 update_tournament_visibility()
 
+
+select_frame2 = tk.Frame(root)
+select_frame2.pack(pady=0)
+
+
+tk.Label(select_frame2, text="Cross method", anchor="w", width=25).grid(row=0, column=0)
+cross_method_combobox = ttk.Combobox(select_frame2, textvariable=cross_method_var, values=["One-Point", "Two-Point", "Uniform crossover", "Granular crossover"], width=15)
+cross_method_combobox.grid(row=0, column=1)
+cross_method_combobox.state(["readonly"])
+
+
+tk.Label(select_frame2, text="Cross probability", anchor="w", width=23).grid(row=1, column=0, padx=0, pady=2)
+tk.Entry(select_frame2, textvariable=cross_prob_var, width=15).grid(row=1, column=1, padx=5, pady=2)
+
+cross_probability_label = tk.Label(select_frame2, text="cross probability", anchor="w", width=25)
+cross_probability_entry = tk.Entry(select_frame2, textvariable=cross_probability_var, width=15)
+
+update_ross_probability_visibility()
+
+
+
+
 select_frame = tk.Frame(root)
 select_frame.pack(pady=0)
-
-tk.Label(select_frame, text="Cross method", anchor="w", width=25).grid(row=0, column=0)
-cross_method_combobox = ttk.Combobox(select_frame, textvariable=cross_method_var, values=["One-Point", "Two-Point", "Tree-Point", "Uniform crossover", "Granular crossover"], width=15)
-cross_method_combobox.grid(row=1, column=1)
-cross_method_combobox.state(["readonly"])
 
 tk.Label(select_frame, text="Mutation method", anchor="w", width=25).grid(row=1, column=0)
 mutation_method_combobox = ttk.Combobox(select_frame, textvariable=mutation_method_var, values=["Boundary", "One-Point", "Two-Point"], width=15)

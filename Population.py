@@ -260,8 +260,40 @@ class Population:
         # print("Child 2 chromosoms:", child2.chromosom.chromosoms)
         
         return child1, child2 
+    
+    #krzyżowanie ziarniste
+    def discrete_crossover(self, parent1, parent2):
+        """Krzyżowanie ziarniste dla chromosomów binarnych."""
+        child1prim_chromosoms = []   
         
-    def population_after_crossover(self, crossover_method_number, crossover_rate=1.0):
+        print("Parent 1 chromosoms:", parent1.chromosom.chromosoms)
+        print("Parent 2 chromosoms:", parent2.chromosom.chromosoms)
+        
+        for p1_chromo, p2_chromo in zip(parent1.chromosom.chromosoms, parent2.chromosom.chromosoms):
+            child1prim_genes = []
+            
+            for gene1, gene2 in zip(p1_chromo, p2_chromo):  
+                gene_random_rate = random.uniform(0, 1)
+                print("Gene random rate:", gene_random_rate)
+    
+                if gene_random_rate <= 0.5:
+                    child1prim_genes.append(gene1)
+                else:
+                    child1prim_genes.append(gene2)
+            
+            # Dodajemy nowo utworzone chromosomy do listy chromosomów dzieci
+            child1prim_chromosoms.append(child1prim_genes)
+    
+        # Tworzymy nowe osobniki
+        child1prim = Individual(parent1.chromosom.precision, parent1.variables_count, parent1.chromosom.start_, parent1.chromosom.end_)
+
+        # Podmieniamy chromosomy na nowe
+        child1prim.chromosom.chromosoms = child1prim_chromosoms
+    
+        print("Child 1' chromosoms:", child1prim.chromosom.chromosoms)
+        
+        return child1prim, _
+    def population_after_crossover(self, crossover_method_number, crossover_rate=1.0, cross_probability=0.7):
         """Wykonuje krzyżowanie dla całej populacji."""
         new_population = []
         selected_individuals = self.best_individuals[:]
@@ -276,12 +308,18 @@ class Population:
                 elif crossover_method_number == 2:
                     child1, child2 = self.two_point_crossover(parent1, parent2)
                 elif crossover_method_number == 3:
-                    child1, child2 = self.uniform_crossover(parent1, parent2, cross_probability=0.7)
-                new_population.extend([child1, child2])
+                    child1, child2 = self.uniform_crossover(parent1, parent2, cross_probability)
+                elif crossover_method_number == 4:
+                    child1 = self.discrete_crossover(parent1, parent2)
+                try:
+                    new_population.extend([child1, child2])  
+                except Exception as e:
+                    new_population.extend([child1]) 
             else:
                 new_population.extend([parent1, parent2])
     
         self.best_individuals = new_population
+
 
         
     def getX(self) -> list:
@@ -377,7 +415,7 @@ class Population:
 
         """Strategia elitarna – wybiera najlepsze osobniki do nowej populacji."""
 
-        sorted_population = sorted(self.individuals, key=lambda ind: self.fitness(ind), reverse=True) #reverse=self.optimum
+        sorted_population = sorted(self.individuals, key=lambda ind: self.fitness(ind), reverse=self.optimum) #reverse=self.optimum
         elite_num = elite_count if elite_count else int(self.population_size * elite_percent)
 
 
