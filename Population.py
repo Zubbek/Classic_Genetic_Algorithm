@@ -55,11 +55,22 @@ class Population:
       return best_individuals
 
     def getBestByRulet(self) -> list:
-        """Zwraca najlepsze osobniki według funkcji celu."""
+        """Zwraca najlepsze osobniki według funkcji celu, unikając ujemnych wartości."""
         cell = self.cell.copy()
         best_individuals = []
+
+        # Jeśli minimalizujemy, zamieniamy wartości na odwrotności
         if self.optimum == 0:
-          cell = {key: 1/value for key, value in cell.items()}
+            cell = {key: 1 / value for key, value in cell.items()}
+
+        # Znajdujemy najmniejszą wartość funkcji celu
+        min_value = min(cell.values())
+
+        # Jeśli wartości są ujemne, dodajemy stałą przesunięcia
+        if min_value < 0:
+            shift_constant = abs(min_value) + 1  # Zapewniamy, że wszystkie wartości będą dodatnie
+            cell = {key: value + shift_constant for key, value in cell.items()}
+
         total_fitness = sum(cell.values())
         if total_fitness == 0:
             raise ValueError("Total fitness is zero!")
@@ -74,18 +85,23 @@ class Population:
             distribution_value += probability
             distribution[value] = distribution_value
 
-        if round(sum(probabilities.values())) != 1.0:
-            raise ValueError("Sum of probabilities is not equal to 1!")
-        last_item = round(list(distribution.items())[-1][1])
-        if last_item != 1.0:
-            raise ValueError("Last distribution value is not equal to 1!")
+        # Poprawiona walidacja sumy prawdopodobieństw
+        if not (0.9999 <= sum(probabilities.values()) <= 1.0001):
+            raise ValueError("Sum of probabilities is not approximately 1!")
+
+        last_item = list(distribution.items())[-1][1]
+        if not (0.9999 <= last_item <= 1.0001):
+            raise ValueError("Last distribution value is not approximately 1!")
+
         num = random.random()
         for key, value in distribution.items():
             if num <= value:
-                x = next(k for k, v in cell.items() if v == key)
-                best_individuals.append((x, self.cell[x]))  # Zapisujemy klucz + wartość
-                del cell[x]  # Usuwamy osobnika
-                break
+                # Znalezienie pierwszego osobnika o tej wartości
+                candidates = [k for k, v in cell.items() if v == key]
+                x = random.choice(candidates)  # Jeśli kilku, losujemy jednego
+                best_individuals.append((x, self.cell[x]))  # Zachowujemy w oryginalnej skali
+                break  # Wybieramy jednego, nie usuwamy z `cell`
+
         return best_individuals
     
     #krzyżowanie jednopunktowe
