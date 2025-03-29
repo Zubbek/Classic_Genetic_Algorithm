@@ -18,7 +18,9 @@ class Population:
         for x in X:
             x_tuple = tuple(x)  
             cell_value = self.func(x) 
-            cell_dict[x_tuple] = cell_value  
+            cell_dict[x_tuple] = cell_value
+            
+        self.cell=cell_dict 
         return cell_dict
         
     def getSortedCell(self) -> list[tuple[tuple[float], float]]:
@@ -92,14 +94,14 @@ class Population:
         child1_chromosoms = []
         child2_chromosoms = []
     
-        print("Parent 1 chromosoms:", parent1.chromosom.chromosoms)
-        print("Parent 2 chromosoms:", parent2.chromosom.chromosoms)
+        # print("Parent 1 chromosoms:", parent1.chromosom.chromosoms)
+        # print("Parent 2 chromosoms:", parent2.chromosom.chromosoms)
     
         # Iterujemy po każdej zmiennej w chromosomie (bo może być ich kilka)
         for p1_chromo, p2_chromo in zip(parent1.chromosom.chromosoms, parent2.chromosom.chromosoms):
             end_of_range = len(p1_chromo)
             k = random.randint(1, end_of_range - 1)  # Punkt krzyżowania (nie może być 0)
-            print(f"Crossover point: {k}")
+            # print(f"Crossover point: {k}")
     
             # Tworzymy nowe chromosomy dzieci
             new_p1 = p1_chromo[:k] + p2_chromo[k:]
@@ -116,8 +118,8 @@ class Population:
         child1.chromosom.chromosoms = child1_chromosoms
         child2.chromosom.chromosoms = child2_chromosoms
     
-        print("Child 1 chromosoms:", child1.chromosom.chromosoms)
-        print("Child 2 chromosoms:", child2.chromosom.chromosoms)
+        # print("Child 1 chromosoms:", child1.chromosom.chromosoms)
+        # print("Child 2 chromosoms:", child2.chromosom.chromosoms)
     
         return child1, child2
     
@@ -127,8 +129,8 @@ class Population:
         child1_chromosoms = []
         child2_chromosoms = []
     
-        print("Parent 1 chromosoms:", parent1.chromosom.chromosoms)
-        print("Parent 2 chromosoms:", parent2.chromosom.chromosoms)
+        # print("Parent 1 chromosoms:", parent1.chromosom.chromosoms)
+        # print("Parent 2 chromosoms:", parent2.chromosom.chromosoms)
     
         # Iterujemy po każdej zmiennej w chromosomie (bo może być ich kilka)
         for p1_chromo, p2_chromo in zip(parent1.chromosom.chromosoms, parent2.chromosom.chromosoms):
@@ -138,11 +140,11 @@ class Population:
                 point2 = random.randint(1, end_of_range - 1)
                 if point2 != point1 and abs(point2 - point1) >= min_gap:
                     break
-            print(f"Crossover points: {point1} {point2}")
+            # print(f"Crossover points: {point1} {point2}")
             
             lower = min(point1, point2)
             upper = max(point1, point2)
-            print(lower, upper)
+            # print(lower, upper)
             # Tworzymy nowe chromosomy dzieci
             new_p1 = p1_chromo[:lower] + p2_chromo[lower:upper] + p1_chromo[upper:]
             new_p2 = p2_chromo[:lower] + p1_chromo[lower:upper] + p2_chromo[upper:]
@@ -158,8 +160,8 @@ class Population:
         child1.chromosom.chromosoms = child1_chromosoms
         child2.chromosom.chromosoms = child2_chromosoms
     
-        print("Child 1 chromosoms:", child1.chromosom.chromosoms)
-        print("Child 2 chromosoms:", child2.chromosom.chromosoms)
+        # print("Child 1 chromosoms:", child1.chromosom.chromosoms)
+        # print("Child 2 chromosoms:", child2.chromosom.chromosoms)
         
         return child1, child2
     
@@ -185,7 +187,7 @@ class Population:
         
     def getX(self) -> list:
         """Zwraca listę fenotypów (wartości zmiennych)."""
-        return [[float(x) for x in individual.chromosom.decoded_chromosom] for individual in self.individuals]
+        return [[float(x) for x in individual.chromosom._decode_chromosom()] for individual in self.individuals]
 
     def __str__(self):
         return "\n".join(str(individual) for individual in self.individuals)
@@ -246,7 +248,7 @@ class Population:
                     
                     c[idx1:idx2 + 1] = list(c[idx1:idx2 + 1])[::-1]
         
-        print(self.individuals[0].chromosom.chromosoms)
+        # print(self.individuals[0].chromosom.chromosoms)
                     
     def fitness(self, individual: Individual) :
         """Funkcja przystosowania, używa rzeczywistej funkcji celu.""" 

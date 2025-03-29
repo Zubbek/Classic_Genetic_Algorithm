@@ -107,13 +107,14 @@ def start_algorithm():
     """Funkcja uruchamiająca algorytm genetyczny i zapisująca wyniki dla wykresów."""
     
     def get_value(var, default, cast_type=float):
+        """Funkcja pomocnicza pobierająca wartości z GUI, z obsługą błędów."""
         try:
             value = var.get()
             return cast_type(value) if value else default
         except ValueError:
             return default
 
-    # Pobieranie wartości z GUI
+    # Pobieranie wartości z GUI lub użycie domyślnych
     start_ = get_value(begin_var, -10.0)
     end_ = get_value(end_var, 10.0)
     precision = get_value(precision_var, 4, int)
@@ -130,25 +131,76 @@ def start_algorithm():
     cross_method = cross_method_var.get() or "Single Point"
     mutation_method = mutation_method_var.get() or "One Point"
     function_name = function_var.get() or "Rastrigin"
-    is_maximization = maximization_var.get() if maximization_var.get() else True  
+    is_maximization = maximization_var.get() if maximization_var.get() is not None else True
 
     # Pobranie funkcji celu
     func = get_function(function_name)
 
     # Inicjalizacja populacji
-    population = Population(variables_count, population_size, precision, start_, end_, func, "max" if is_maximization else "min")
+    population = Population(
+        variables_count, population_size, precision, start_, end_, func,
+        "max" if is_maximization else "min"
+    )
 
-
-    # Listy do przechowywania danych dla wykresów
+    # Wykonanie algorytmu przez określoną liczbę epok
     best_fitness_values = []
     avg_fitness_values = []
     std_fitness_values = []
 
-    # do zrobienia wywołanie tego czegoś ------------------------------------------------------------------------------------------------------------
-       
+    for _ in range(epochs):
+        # Selekcja
+        # Selekcja - wybór najlepszych osobników
+        if selection_method == "Roulette Wheel":
+            selected_individuals = population.getBestByRulet()
+            
+        elif selection_method == "Tournament":
+            selected_individuals = population.getBestByTournament(tournament_size)
 
-    # Przekazanie danych do wykresów
+        elif selection_method == "Best solution":
+            selected_individuals = population.getBestBySelection(best_select_percent)
+            
+        # population.individuals =selected_individuals
+                
+        # Krzyżowanie
+        population.population_after_single_point_crossover(
+            crossover_method_number=1 if cross_method == "Single Point" else 2, 
+            crossover_rate=cross_prob
+        )
+
+        # Mutacja
+        population.population_after_mutationr(mutation_method, mutation_prob)
+
+                
+                # Inwersja
+        population.inversion(inversion_prob)
+        print(population.individuals)
+        
+        # Elitaryzm
+        elite_individuals = population.elitism(elite_percent)
+        population.individuals.extend(elite_individuals)
+        
+       # Obliczanie wartości funkcji celu dla populacji
+        fitness_dict = population.getCell()  # Zwraca słownik {fenotyp: wartość funkcji celu}
+        fitness_values = list(fitness_dict.values())  # Pobiera same wartości fitness
+
+        # Obliczanie metryk fitness
+        best_fitness_values.append(max(fitness_values))  # Najlepsza wartość fitness
+        avg_fitness = sum(fitness_values) / len(fitness_values)  # Średnia wartość fitness
+        avg_fitness_values.append(avg_fitness)
+
+        # Odchylenie standardowe fitness
+        std_fitness_values.append((sum((x - avg_fitness) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5)
+        
+        
+        # fitness_values = [float(population.fitness(individual)) for individual in population.individuals]
+        # best_fitness_values.append(max(fitness_values))  # Najlepsza wartość fitness
+        # avg_fitness_values.append(sum(fitness_values) / len(fitness_values))  # Średnia wartość fitness
+        # std_fitness_values.append((sum((x - avg_fitness_values[-1]) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5)  # Odchylenie standardowe
+
+
+    # Wyświetlenie wyników na wykresie
     PlotViewer(root, best_fitness_values, avg_fitness_values, std_fitness_values)
+
 
 
 
