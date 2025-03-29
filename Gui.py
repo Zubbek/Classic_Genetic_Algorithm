@@ -6,8 +6,8 @@ import numpy as np
 from decimal import Decimal, getcontext
 import math
 import time
-# import benchmark_functions as bf
-# from opfunu.cec_based.cec2014 import F12014
+import benchmark_functions as bf
+from opfunu.cec_based.cec2014 import F12014
 from Population import Population
 
 #  potem do dodania jak wybierzemy --------------------------------------------------------------------------------
@@ -16,7 +16,7 @@ getcontext().prec = 50
 def get_function(name, ndim):
     """Zwraca wybraną funkcję testową na podstawie jej nazwy."""
     if name == "Hypersphere":
-        return lambda x: sum(xi ** 2 for xi in x)
+        return bf.Hypersphere(n_dimensions=ndim)
     elif name == "Rotated High Conditioned Elliptic Function":
         func = F12014(ndim=ndim)
         return func.evaluate
