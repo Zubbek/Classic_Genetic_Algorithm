@@ -20,11 +20,12 @@ class Population:
             cell_value = self.func(x) 
             cell_dict[x_tuple] = cell_value
             
-        self.cell=cell_dict 
+
         return cell_dict
         
     def getSortedCell(self) -> list[tuple[tuple[float], float]]:
         """Sortuje wartości funkcji celu."""
+        self.cell=self.getCell() 
         return sorted(self.cell.items(), key=lambda item: item[1], reverse=self.optimum)
 
     def getBestBySelection(self, percentage: float,) -> list:

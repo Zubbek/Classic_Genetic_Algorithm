@@ -181,17 +181,19 @@ def start_algorithm():
         population.individuals.extend(elite_individuals)
         
        # Obliczanie wartości funkcji celu dla populacji
-        fitness_dict = population.getCell()  # Zwraca słownik {fenotyp: wartość funkcji celu}
-        fitness_values = list(fitness_dict.values())  # Pobiera same wartości fitness
+        fitness_sorted = population.getSortedCell()
+
+        # Pobiera tylko same wartości fitness (drugi element każdej krotki)
+        fitness_values = [fitness for _, fitness in fitness_sorted]
 
         # Obliczanie metryk fitness
-        best_fitness_values.append(max(fitness_values))  # Najlepsza wartość fitness
+        best_fitness_values.append(fitness_values[0])  # Najlepsza wartość fitness (pierwszy element w posortowanej liście)
         avg_fitness = sum(fitness_values) / len(fitness_values)  # Średnia wartość fitness
         avg_fitness_values.append(avg_fitness)
 
         # Odchylenie standardowe fitness
-        std_fitness_values.append((sum((x - avg_fitness) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5)
-        
+        std_fitness = (sum((x - avg_fitness) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5
+        std_fitness_values.append(std_fitness)
         
         # fitness_values = [float(population.fitness(individual)) for individual in population.individuals]
         # best_fitness_values.append(max(fitness_values))  # Najlepsza wartość fitness
