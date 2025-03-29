@@ -267,14 +267,28 @@ class Population:
         
         # print(self.individuals[0].chromosom.chromosoms)
                     
-    def fitness(self, individual: Individual) :
-        """Funkcja przystosowania, używa rzeczywistej funkcji celu.""" 
-        # w sumie nie wiem którą wersję wziąść
+    # def fitness(self, individual: Individual) :
+    #     """Funkcja przystosowania, używa rzeczywistej funkcji celu.""" 
+    #     # w sumie nie wiem którą wersję wziąść
         
-        return self.func(individual.chromosom._decode_chromosom())
-        return self.func(individual.chromosom.decoded_chromosom)
-        # return sum(x.count(1) for x in individual.chromosom.chromosoms) 
+    #     return self.func(individual.chromosom._decode_chromosom())
+    #     return self.func(individual.chromosom.decoded_chromosom)
+    #     # return sum(x.count(1) for x in individual.chromosom.chromosoms) 
 
+    def fitness(self, individual: Individual):
+        """Funkcja przystosowania, używa rzeczywistej funkcji celu."""  
+        decoded = individual.chromosom._decode_chromosom()
+        
+        # Debugowanie, aby zobaczyć, co zwraca dekodowanie
+        print("Decoded Chromosome:", decoded, [type(x) for x in decoded])
+
+        # Sprawdzenie, czy wszystkie wartości są float lub Decimal
+        try:
+            decoded = [float(x) for x in decoded]
+        except ValueError:
+            raise ValueError(f"Błąd konwersji: {decoded}")
+
+        return self.func(decoded)
 
     def elitism(self, elite_percent: float = 0.1, elite_count: int = None):
 

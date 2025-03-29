@@ -2,7 +2,6 @@ from decimal import Decimal
 from math import log2, ceil
 import random
 
-
 class Chromosom:
     def __init__(self, precision, variables_count, start_, end_):
         self.precision = precision
@@ -32,4 +31,3 @@ class Chromosom:
     
     def __str__(self):
         return f"Chromosoms: {self.chromosoms} | Value in Decimal: {self.decoded_chromosom}"
-

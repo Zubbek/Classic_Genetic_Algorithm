@@ -5,24 +5,21 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 from decimal import Decimal, getcontext
 import math
-# import benchmark_functions as bf
-
+import time
+import benchmark_functions as bf
+from opfunu.cec_based.cec2014 import F12014
 from Population import Population
-
 
 #  potem do dodania jak wybierzemy --------------------------------------------------------------------------------
 getcontext().prec = 50 
-def get_function(name):
+
+def get_function(name, ndim):
     """Zwraca wybraną funkcję testową na podstawie jej nazwy."""
-    if name == "Function 1":
-        return lambda x: sum(xi ** 2 for xi in x)
-    elif name ==  "Function 2":
-        # return lambda x: 10 * len(x) + sum(xi ** 2 - 10 * np.cos(2 * np.pi * xi) for xi in x)
-    # elif name == "Ackley":
-        return lambda x: Decimal(-20) * (-Decimal("0.2") * (sum(Decimal(xi)**2 for xi in x) / len(x)).sqrt()).exp() - \
-                 sum(Decimal(math.cos(2 * math.pi * float(xi))) for xi in x) / len(x) + Decimal(20) + Decimal(math.e)
-    else:
-        raise ValueError("Nieznana funkcja")
+    if name == "Hypersphere":
+        return bf.Hypersphere(n_dimensions=ndim)
+    elif name == "Rotated High Conditioned Elliptic Function":
+        func = F12014(ndim=ndim)
+        return func.evaluate
 
 
 # od wyukresów aby sie dało przewijać - jescze do dopracowania------------------------------------------------------------------
@@ -104,8 +101,7 @@ class PlotViewer:
 
 #  tutaj obsłużyc te wszystki ecklasy i funkcje jak wiesz co twoja klasa robi to mozesz dopisać -------------------------------- ---------------  
 def start_algorithm():
-    """Funkcja uruchamiająca algorytm genetyczny i zapisująca wyniki dla wykresów."""
-    
+    """Uruchamia algorytm genetyczny z wartościami z GUI."""
     def get_value(var, default, cast_type=float):
         """Funkcja pomocnicza pobierająca wartości z GUI, z obsługą błędów."""
         try:
@@ -120,7 +116,7 @@ def start_algorithm():
     precision = get_value(precision_var, 4, int)
     population_size = get_value(population_var, 50, int)
     epochs = get_value(epochs_var, 100, int)
-    variables_count = get_value(params_var, 2, int)
+    variables_count = get_value(params_var, 10, int)
     elite_percent = get_value(elite_var, 10.0) / 100
     cross_prob = get_value(cross_prob_var, 0.8)
     mutation_prob = get_value(mutation_prob_var, 0.05)
@@ -134,19 +130,16 @@ def start_algorithm():
     is_maximization = maximization_var.get() if maximization_var.get() is not None else True
 
 
-    # Pobranie funkcji celu
-    func = get_function(function_name)
-
-    # Inicjalizacja populacji
-    population = Population(
-        variables_count, population_size, precision, start_, end_, func,
-        "max" if is_maximization else "min"
-    )
-
-    # Wykonanie algorytmu przez określoną liczbę epok
+    func = get_function(function_name, variables_count)
+    
+    population = Population(variables_count, population_size, precision, start_, end_, func, "max" if is_maximization else "min")
+    
     best_fitness_values = []
     avg_fitness_values = []
     std_fitness_values = []
+
+    # Zarejestruj czas początkowy
+    start_time = time.time()
 
     for _ in range(epochs):
         # Selekcja
@@ -201,11 +194,17 @@ def start_algorithm():
         # std_fitness_values.append((sum((x - avg_fitness_values[-1]) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5)  # Odchylenie standardowe
 
 
+    # Zarejestruj czas zakończenia
+    end_time = time.time()
+
+    # Oblicz czas działania algorytmu
+    elapsed_time = end_time - start_time
     # Wyświetlenie wyników na wykresie
-    PlotViewer(root, best_fitness_values, avg_fitness_values, std_fitness_values)
+    plot_viewer = PlotViewer(root, best_fitness_values, avg_fitness_values, std_fitness_values)
 
-
-
+    # Dodaj etykietę z czasem wykonania pod wykresami
+    time_label = tk.Label(plot_viewer.plot_window, text=f"Czas działania algorytmu: {elapsed_time:.4f} sekundy", font=("Arial", 12))
+    time_label.pack(pady=10)
 
 # to tam mało istotne co jest niżej ----------------------------------------------------------------------------------------------
 
@@ -224,18 +223,18 @@ root.title("Genetic Algorithm Configuration")
 root.geometry("350x550")
 
 # Tworzenie pól wejściowych
-begin_var = tk.StringVar()
-end_var = tk.StringVar()
-precision_var = tk.StringVar()
-population_var = tk.StringVar()
-epochs_var = tk.StringVar()
-params_var = tk.StringVar()
-elite_var = tk.StringVar()
-cross_prob_var = tk.StringVar()
-mutation_prob_var = tk.StringVar()
-inversion_prob_var = tk.StringVar()
-best_select_var = tk.StringVar()
-tournament_var = tk.StringVar()
+begin_var = tk.StringVar(value=-10)
+end_var = tk.StringVar(value=10)
+precision_var = tk.StringVar(value=4)
+population_var = tk.StringVar(value=50)
+epochs_var = tk.StringVar(value=100)
+
+elite_var = tk.StringVar(value=10.0)
+cross_prob_var = tk.StringVar(value=0.8)
+mutation_prob_var = tk.StringVar(value=0.05)
+inversion_prob_var = tk.StringVar(value=0.01)
+best_select_var = tk.StringVar(value=20.0)
+tournament_var = tk.StringVar(value=3)
 params_var = tk.StringVar(value="10")
 choices = ["10", "20", "30", "50", "100"]
 
@@ -245,7 +244,7 @@ selection_var.trace_add("write", update_tournament_visibility)  # Automatyczna r
 
 cross_method_var = tk.StringVar(value="One-Point")
 mutation_method_var = tk.StringVar(value="Boundary")
-function_var = tk.StringVar(value="Function 1")
+function_var = tk.StringVar(value="Hypersphere")
 
 # Minimalizacja/maksymalizacja (radio buttons)
 maximization_var = tk.BooleanVar(value=True)
@@ -307,7 +306,7 @@ mutation_method_combobox.grid(row=2, column=1)
 mutation_method_combobox.state(["readonly"]) 
 
 tk.Label(select_frame, text="Function to calculation", anchor="w", width=25).grid(row=2, column=0)
-function_combobox = ttk.Combobox(select_frame, textvariable=function_var, values=["Function 1", "Function 2"], width=15)
+function_combobox = ttk.Combobox(select_frame, textvariable=function_var, values=["Hypersphere", "Rotated High Conditioned Elliptic Function"], width=15)
 function_combobox.grid(row=3, column=1)
 function_combobox.state(["readonly"])
 
