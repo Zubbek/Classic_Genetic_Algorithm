@@ -5,6 +5,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 from decimal import Decimal, getcontext
 import math
+import time
 import benchmark_functions as bf
 from opfunu.cec_based.cec2014 import F12014
 from Population import Population
@@ -137,6 +138,9 @@ def start_algorithm():
     avg_fitness_values = []
     std_fitness_values = []
 
+    # Zarejestruj czas początkowy
+    start_time = time.time()
+
     for _ in range(epochs):
         # Selekcja
         # Selekcja - wybór najlepszych osobników
@@ -188,11 +192,17 @@ def start_algorithm():
         # std_fitness_values.append((sum((x - avg_fitness_values[-1]) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5)  # Odchylenie standardowe
 
 
+    # Zarejestruj czas zakończenia
+    end_time = time.time()
+
+    # Oblicz czas działania algorytmu
+    elapsed_time = end_time - start_time
     # Wyświetlenie wyników na wykresie
-    PlotViewer(root, best_fitness_values, avg_fitness_values, std_fitness_values)
+    plot_viewer = PlotViewer(root, best_fitness_values, avg_fitness_values, std_fitness_values)
 
-
-
+    # Dodaj etykietę z czasem wykonania pod wykresami
+    time_label = tk.Label(plot_viewer.plot_window, text=f"Czas działania algorytmu: {elapsed_time:.4f} sekundy", font=("Arial", 12))
+    time_label.pack(pady=10)
 
 # to tam mało istotne co jest niżej ----------------------------------------------------------------------------------------------
 
@@ -211,11 +221,11 @@ root.title("Genetic Algorithm Configuration")
 root.geometry("350x550")
 
 # Tworzenie pól wejściowych
-begin_var = tk.StringVar()
-end_var = tk.StringVar()
-precision_var = tk.StringVar()
-population_var = tk.StringVar()
-epochs_var = tk.StringVar()
+begin_var = tk.StringVar(value=-10)
+end_var = tk.StringVar(value=10)
+precision_var = tk.StringVar(value=4)
+population_var = tk.StringVar(value=50)
+epochs_var = tk.StringVar(value=100)
 
 elite_var = tk.StringVar()
 cross_prob_var = tk.StringVar()
