@@ -227,12 +227,12 @@ precision_var = tk.StringVar(value=4)
 population_var = tk.StringVar(value=50)
 epochs_var = tk.StringVar(value=100)
 
-elite_var = tk.StringVar()
-cross_prob_var = tk.StringVar()
-mutation_prob_var = tk.StringVar()
-inversion_prob_var = tk.StringVar()
-best_select_var = tk.StringVar()
-tournament_var = tk.StringVar()
+elite_var = tk.StringVar(value=10.0)
+cross_prob_var = tk.StringVar(value=0.8)
+mutation_prob_var = tk.StringVar(value=0.05)
+inversion_prob_var = tk.StringVar(value=0.01)
+best_select_var = tk.StringVar(value=20.0)
+tournament_var = tk.StringVar(value=3)
 params_var = tk.StringVar(value="10")
 choices = ["10", "20", "30", "50", "100"]
 
