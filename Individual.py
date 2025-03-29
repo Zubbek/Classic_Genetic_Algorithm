@@ -6,7 +6,4 @@ class Individual:
         self.variables_count = variables_count
 
     def __str__(self):
-        return f"{self.chromosom}"
-    
-    
-    
+        return f"{self.chromosom}"  
