@@ -190,23 +190,26 @@ def start_algorithm():
         fitness_sorted = population.getSortedCell()
 
 
-        # Pobiera tylko same wartości fitness (drugi element każdej krotki)
-        fitness_values = [fitness for _, fitness in fitness_sorted]
-
-        # Obliczanie metryk fitness
-        best_fitness_values.append(fitness_values[0])  # Najlepsza wartość fitness (pierwszy element w posortowanej liście)
-        avg_fitness = sum(fitness_values) / len(fitness_values)  # Średnia wartość fitness
-        avg_fitness_values.append(avg_fitness)
-
-        # Odchylenie standardowe fitness
-        std_fitness = (sum((x - avg_fitness) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5
-        std_fitness_values.append(std_fitness)
+        # # Pobiera tylko same wartości fitness (drugi element każdej krotki)
+        # fitness_values = [fitness for _, fitness in fitness_sorted]
+        #
+        # # Obliczanie metryk fitness
+        # best_fitness_values.append(fitness_values[0])  # Najlepsza wartość fitness (pierwszy element w posortowanej liście)
+        # avg_fitness = sum(fitness_values) / len(fitness_values)  # Średnia wartość fitness
+        # avg_fitness_values.append(avg_fitness)
+        #
+        # # Odchylenie standardowe fitness
+        # std_fitness = (sum((x - avg_fitness) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5
+        # std_fitness_values.append(std_fitness)
 
         
-        # fitness_values = [float(population.fitness(individual)) for individual in population.individuals]
-        # best_fitness_values.append(max(fitness_values))  # Najlepsza wartość fitness
-        # avg_fitness_values.append(sum(fitness_values) / len(fitness_values))  # Średnia wartość fitness
-        # std_fitness_values.append((sum((x - avg_fitness_values[-1]) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5)  # Odchylenie standardowe
+        fitness_values = [float(population.fitness(individual)) for individual in population.individuals]
+        if is_maximization:
+            best_fitness_values.append(max(fitness_values))  # Najlepsza wartość fitness
+        else:
+            best_fitness_values.append(min(fitness_values))
+        avg_fitness_values.append(sum(fitness_values) / len(fitness_values))  # Średnia wartość fitness
+        std_fitness_values.append((sum((x - avg_fitness_values[-1]) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5)  # Odchylenie standardowe
         
         population.individuals=population.best_individuals
 
@@ -215,7 +218,7 @@ def start_algorithm():
 
     # Zarejestruj czas zakończenia
     end_time = time.time()
-
+    save_results_csv("wyniki.csv", best_fitness_values, avg_fitness_values, std_fitness_values)
     # Oblicz czas działania algorytmu
     elapsed_time = end_time - start_time
     # Wyświetlenie wyników na wykresie
@@ -370,6 +373,19 @@ tk.Radiobutton(radio_frame, text="Maximization", variable=maximization_var, valu
 
 # Przycisk startowy
 tk.Button(root, text="Start", command=start_algorithm, width=7, height=1).pack(pady=10)
+
+# zapis do pliku
+import csv
+
+def save_results_csv(filename, best_fitness_values, avg_fitness_values, std_fitness_values):
+    """Zapisuje wyniki algorytmu do pliku CSV."""
+    with open(filename, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Iteracja", "Najlepsza wartość", "Średnia wartość", "Odchylenie standardowe"])
+        for i, (best, avg, std) in enumerate(zip(best_fitness_values, avg_fitness_values, std_fitness_values)):
+            writer.writerow([i, best, avg, std])
+    print(f"Wyniki zapisano do pliku: {filename}")
+
 
 # Uruchomienie aplikacji
 root.mainloop()
