@@ -1,48 +1,8 @@
 import random
 from math import log2, ceil
 from decimal import Decimal
+from Individual import Individual
 
-
-
-class Chromosom:
-    def __init__(self, precision, variables_count, start_, end_):
-        self.precision = precision
-        self.variables_count = variables_count
-        self.start_ = start_
-        self.end_ = end_
-        self.chromosom_len = ceil(self.precision * log2(self.end_ - self.start_))
-        self.chromosoms = self._generate_chromosom()
-        self.decoded_chromosom = self._decode_chromosom()
-
-    def _generate_chromosom(self) -> list:
-      chromosoms = []
-      for i in range(self.variables_count):
-        chromosom = []
-        for i in range(self.chromosom_len):
-            chromosom.append(random.randint(0, 1))
-        chromosoms.append(chromosom)
-      return chromosoms
-
-    def _decode_chromosom(self) -> list:
-        decoded_chromosom = []
-        for chromosom in self.chromosoms:
-            decimal_number = sum(bit * (2 ** i) for i, bit in enumerate(reversed(chromosom)))
-            decoded = self.start_ + decimal_number * (self.end_ - self.start_) / (2 ** self.chromosom_len - 1)
-            # Zmieniamy na float (a nie Decimal)
-            decoded_chromosom.append(float(decoded))  # Zwracamy jako float, żeby uniknąć problemów z Decimal
-        return decoded_chromosom
-
-    def __str__(self):
-        return f"Chromosoms: {self.chromosoms} | Value in Decimal: {self.decoded_chromosom}"
-
-
-class Individual:
-    def __init__(self, precision, variables_count, start_, end_):
-        self.chromosom = Chromosom(precision, variables_count, start_, end_)
-        self.variables_count = variables_count
-
-    def __str__(self):
-        return f"{self.chromosom}"
 
 class Population:
     def __init__(self, variables_count, population_size, precision, start_, end_, func, optimum):
@@ -102,10 +62,13 @@ class Population:
             self.best_individuals.append(best)  # Teraz przechowujemy cały obiekt Individual
 
 
-    def getBestByRulet(self):
+    def getBestByRulet(self, percentage: float):
       """Zwraca najlepsze osobniki według metody ruletki jako listę obiektów Individual."""
+      size = int(percentage * self.population_size / 100)  # Obliczamy liczbę osobników do wybrania
+      self.best_individuals = []
+
       cell = {individual: float(self.func([float(val) for val in individual.chromosom.decoded_chromosom])) for individual in self.individuals}
-      
+
       if self.optimum == 0:
           cell = {key: 1 / value for key, value in cell.items()}
 
@@ -119,23 +82,20 @@ class Population:
       if total_fitness == 0:
           raise ValueError("Total fitness is zero!")
 
-      probabilities = {}
       distribution = {}
       distribution_value = 0
 
-      for value in cell.values():
-          probability = value / total_fitness
-          probabilities[value] = probability
+      for individual, fitness in cell.items():
+          probability = fitness / total_fitness
           distribution_value += probability
-          distribution[value] = distribution_value
+          distribution[individual] = distribution_value
 
-      num = random.random()
-      for key, value in distribution.items():
-          if num <= value:
-              candidates = [k for k, v in cell.items() if v == key]
-              best_individual = random.choice(candidates)
-              self.best_individuals.append(best_individual)
-              break
+      for _ in range(size):
+          num = random.random()
+          for individual, value in distribution.items():
+              if num <= value:
+                  self.best_individuals.append(individual)
+                  break
     
     #krzyżowanie jednopunktowe
     def single_point_crossover(self, parent1, parent2):
@@ -363,6 +323,7 @@ class Population:
         # Sprawdzenie, czy wszystkie wartości są float lub Decimal
         try:
             decoded = [float(x) for x in decoded]
+            print(decoded)
         except ValueError:
             raise ValueError(f"Błąd konwersji: {decoded}")
 
@@ -371,7 +332,7 @@ class Population:
     def elitism(self, elite_percent: float = 0.1, elite_count: int = None):
 
         """Strategia elitarna – wybiera najlepsze osobniki do nowej populacji."""
-        sorted_population = sorted(self.individuals, key=lambda ind: self.fitness(ind), reverse=True)
+        sorted_population = sorted(self.individuals, key=lambda ind: self.fitness(ind), reverse=self.optimum) #reverse=self.optimum
 
         elite_num = elite_count if elite_count else int(self.population_size * elite_percent)
         elite_num = max(1, elite_num)
@@ -392,9 +353,10 @@ if __name__ == "__main__":
 
     # print(population.population_after_mutationr("Two Point"),1)
 
-    for i in population.getBestBySelection(0.6):
-        print(i.chromosom.chromosoms)
+    # for i in population.getBestBySelection(0.6):
+    #     print(i.chromosom.chromosoms)
 
+    population.elitism(0.7)
     # print("---------------------------------------------------------")
 
     

@@ -2,6 +2,7 @@ from decimal import Decimal
 from math import log2, ceil
 import random
 
+
 class Chromosom:
     def __init__(self, precision, variables_count, start_, end_):
         self.precision = precision
@@ -22,12 +23,13 @@ class Chromosom:
       return chromosoms
 
     def _decode_chromosom(self) -> list:
-      decoded_chromosom = []
-      for chromosom in self.chromosoms:
-        decimal_number = sum(bit * (2 ** i) for i, bit in enumerate(reversed(chromosom)))
-        decoded = self.start_ + decimal_number * (self.end_ - self.start_) / (2 ** self.chromosom_len - 1)
-        decoded_chromosom.append(Decimal(decoded).quantize(Decimal(10) ** -self.precision))
-      return decoded_chromosom
-    
+        decoded_chromosom = []
+        for chromosom in self.chromosoms:
+            decimal_number = sum(bit * (2 ** i) for i, bit in enumerate(reversed(chromosom)))
+            decoded = self.start_ + decimal_number * (self.end_ - self.start_) / (2 ** self.chromosom_len - 1)
+            # Zmieniamy na float (a nie Decimal)
+            decoded_chromosom.append(float(decoded))  # Zwracamy jako float, żeby uniknąć problemów z Decimal
+        return decoded_chromosom
+
     def __str__(self):
         return f"Chromosoms: {self.chromosoms} | Value in Decimal: {self.decoded_chromosom}"

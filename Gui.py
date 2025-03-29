@@ -122,7 +122,7 @@ def start_algorithm():
     mutation_prob = get_value(mutation_prob_var, 0.05)
     inversion_prob = get_value(inversion_prob_var, 0.01)
     selection_method = selection_var.get() or "Roulette Wheel"
-    best_select_percent = get_value(best_select_var, 20.0) / 100
+    best_select_percent = get_value(best_select_var, 20.0) 
     tournament_size = get_value(tournament_var, 3, int) if selection_method == "Tournament" else None
     cross_method = cross_method_var.get() or "Single Point"
     mutation_method = mutation_method_var.get() or "One Point"
@@ -142,16 +142,21 @@ def start_algorithm():
     start_time = time.time()
 
     for _ in range(epochs):
+        
+        # Elitaryzm
+        elite_individuals = population.elitism(elite_percent)
+        population.individuals.extend(elite_individuals)
+        
         # Selekcja
         # Selekcja - wybór najlepszych osobników
         if selection_method == "Roulette Wheel":
-            selected_individuals = population.getBestByRulet()
+            population.getBestByRulet(best_select_percent)
             
         elif selection_method == "Tournament":
-            selected_individuals = population.getBestByTournament(tournament_size)
+            population.getBestByTournament(tournament_size)
 
         elif selection_method == "Best solution":
-            selected_individuals = population.getBestBySelection(best_select_percent)
+            population.getBestBySelection(best_select_percent)
             
         # population.individuals =selected_individuals
                 
@@ -165,13 +170,9 @@ def start_algorithm():
         population.population_after_mutationr(mutation_method, mutation_prob)
 
                 
-                # Inwersja
+        # Inwersja
         population.inversion(inversion_prob)
         # print(population.individuals)
-        
-        # Elitaryzm
-        elite_individuals = population.elitism(elite_percent)
-        population.individuals.extend(elite_individuals)
         
        # Obliczanie wartości funkcji celu dla populacji
         fitness_sorted = population.getSortedCell()
@@ -192,7 +193,7 @@ def start_algorithm():
         # best_fitness_values.append(max(fitness_values))  # Najlepsza wartość fitness
         # avg_fitness_values.append(sum(fitness_values) / len(fitness_values))  # Średnia wartość fitness
         # std_fitness_values.append((sum((x - avg_fitness_values[-1]) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5)  # Odchylenie standardowe
-
+        population.individuals=population.best_individuals.extend(elite_individuals)
 
     # Zarejestruj czas zakończenia
     end_time = time.time()
