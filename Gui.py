@@ -133,6 +133,7 @@ def start_algorithm():
     function_name = function_var.get() or "Rastrigin"
     is_maximization = maximization_var.get() if maximization_var.get() is not None else True
 
+
     # Pobranie funkcji celu
     func = get_function(function_name)
 
@@ -173,7 +174,7 @@ def start_algorithm():
                 
                 # Inwersja
         population.inversion(inversion_prob)
-        print(population.individuals)
+        # print(population.individuals)
         
         # Elitaryzm
         elite_individuals = population.elitism(elite_percent)
@@ -233,6 +234,8 @@ mutation_prob_var = tk.StringVar()
 inversion_prob_var = tk.StringVar()
 best_select_var = tk.StringVar()
 tournament_var = tk.StringVar()
+params_var = tk.StringVar(value="10")
+choices = ["10", "20", "30", "50", "100"]
 
 # Tworzenie list rozwijanych
 selection_var = tk.StringVar(value="Roulette Wheel")
@@ -247,7 +250,7 @@ maximization_var = tk.BooleanVar(value=True)
 
 # Tworzymy ramkę dla lepszego układu
 frame = tk.Frame(root)
-frame.pack(pady=10)
+frame.pack(pady=12)
 
 fields = [
     ("Begin of the range", begin_var),
@@ -255,7 +258,7 @@ fields = [
     ("Precision", precision_var),
     ("Population", population_var),
     ("Epochs", epochs_var),
-    ("Number of parameters", params_var),
+    # ("Number of parameters", params_var),
     ("Percentage elite strategy", elite_var),
     ("Cross probability", cross_prob_var),
     ("Mutation probability", mutation_prob_var),
@@ -268,6 +271,10 @@ for i, (label, var) in enumerate(fields):
     tk.Entry(frame, textvariable=var, width=15).grid(row=i, column=1, padx=5, pady=2)
 
 # Listy rozwijane
+tk.Label(frame, text="Number of parameters", anchor="w", width=23).grid(row=11, column=0, padx=0, pady=2)
+dropdown = tk.OptionMenu(frame, params_var, *choices)
+dropdown.grid(row=11, column=1)
+
 select_frame1 = tk.Frame(root)
 select_frame1.pack(pady=0)
 
