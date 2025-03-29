@@ -6,8 +6,8 @@ import numpy as np
 from decimal import Decimal, getcontext
 import math
 import time
-import benchmark_functions as bf
-from opfunu.cec_based.cec2014 import F12014
+# import benchmark_functions as bf
+# from opfunu.cec_based.cec2014 import F12014
 from Population import Population
 
 #  potem do dodania jak wybierzemy --------------------------------------------------------------------------------
@@ -16,7 +16,7 @@ getcontext().prec = 50
 def get_function(name, ndim):
     """Zwraca wybraną funkcję testową na podstawie jej nazwy."""
     if name == "Hypersphere":
-        return bf.Hypersphere(n_dimensions=ndim)
+        return lambda x: sum(xi ** 2 for xi in x)
     elif name == "Rotated High Conditioned Elliptic Function":
         func = F12014(ndim=ndim)
         return func.evaluate
@@ -145,7 +145,7 @@ def start_algorithm():
         
         # Elitaryzm
         elite_individuals = population.elitism(elite_percent)
-        population.individuals.extend(elite_individuals)
+        # population.individuals.extend(elite_individuals)
         
         # Selekcja
         # Selekcja - wybór najlepszych osobników
@@ -161,7 +161,7 @@ def start_algorithm():
         # population.individuals =selected_individuals
                 
         # Krzyżowanie
-        population.population_after_single_point_crossover(
+        population.population_after_crossover(
             crossover_method_number=1 if cross_method == "Single Point" else 2, 
             crossover_rate=cross_prob
         )
@@ -177,6 +177,7 @@ def start_algorithm():
        # Obliczanie wartości funkcji celu dla populacji
         fitness_sorted = population.getSortedCell()
 
+
         # Pobiera tylko same wartości fitness (drugi element każdej krotki)
         fitness_values = [fitness for _, fitness in fitness_sorted]
 
@@ -188,12 +189,17 @@ def start_algorithm():
         # Odchylenie standardowe fitness
         std_fitness = (sum((x - avg_fitness) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5
         std_fitness_values.append(std_fitness)
+
         
         # fitness_values = [float(population.fitness(individual)) for individual in population.individuals]
         # best_fitness_values.append(max(fitness_values))  # Najlepsza wartość fitness
         # avg_fitness_values.append(sum(fitness_values) / len(fitness_values))  # Średnia wartość fitness
         # std_fitness_values.append((sum((x - avg_fitness_values[-1]) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5)  # Odchylenie standardowe
-        population.individuals=population.best_individuals.extend(elite_individuals)
+        
+        population.individuals=population.best_individuals
+
+        population.individuals.extend(elite_individuals)
+
 
     # Zarejestruj czas zakończenia
     end_time = time.time()
