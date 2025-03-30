@@ -11,67 +11,10 @@ class Population:
         self.func = func
         self.individuals = [Individual(precision, variables_count, start_, end_) for _ in range(self.population_size)]
         self.optimum = 0 if optimum == "min" else 1
-        self.cell = self.getCell()
-        self.cell2 = self.getCell2()
-        
-        
         self.precision = precision
         self.best_individuals = []
 
 
-    def getCell2(self) -> dict:
-        """Oblicza wartości funkcji celu dla populacji."""
-        cell_dict = {}
-        X = self.getX2()
-        for individual in self.individuals:
-            x = individual.chromosom._decode_chromosom()  # Używamy chromosomu tego indywiduum
-            x_tuple = tuple(x)  
-            cell_value = self.func(x)  # Obliczamy wartość funkcji celu dla x
-            cell_dict[x_tuple] = (cell_value, individual)  # Przechowujemy krotkę: wartość funkcji celu i individual
-
-        return cell_dict
-
-    def getSortedCell2(self) -> list:
-        """Sortuje osobniki według wartości funkcji celu i zwraca listę posortowanych individuals."""
-        self.cell2 = self.getCell2()  # Pobiera słownik {x_tuple: (cell_value, individual)}
-
-        # Sortujemy wartości po cell_value (pierwszy element krotki)
-        sorted_individuals = [individual for _, (cell_value, individual) in 
-                            sorted(self.cell2.items(), key=lambda item: item[1][0], reverse=self.optimum)]
-        
-        return sorted_individuals
-
-
-    def getBestBySelection2(self, percentage: float) -> list:
-        """Zwraca najlepsze osobniki według funkcji celu."""
-        size = int(percentage * self.population_size / 100)
-        
-        # Pobierz posortowaną listę komórek, gdzie każda komórka to (wartość funkcji celu, individual)
-        best_individuals_with_values = self.getSortedCell2()
-
-        # Zwróć tylko najlepszych osobników
-        best_individuals = [individual for individual in best_individuals_with_values[:size]]
-        
-        return best_individuals
-
-
-    def getX2(self) -> list:
-        """Zwraca listę fenotypów (wartości zmiennych)."""
-        return [[float(x) for x in individual.chromosom._decode_chromosom()] for individual in self.individuals]
-
-    def getCell(self) -> dict:
-        """Oblicza wartości funkcji celu dla populacji."""
-        cell_dict = {}
-        X = self.getX()
-        for x in X:
-            x_tuple = tuple(x)
-            cell_value = self.func(x)
-            cell_dict[x_tuple] = cell_value
-        return cell_dict
-
-    def getSortedCell(self) -> list[tuple[tuple[float], float]]:
-        """Sortuje wartości funkcji celu."""
-        return sorted(self.cell.items(), key=lambda item: item[1], reverse=self.optimum)
 
     def getBestBySelection(self, percentage: float):
           """Zwraca najlepsze osobniki jako listę obiektów Individual."""
@@ -80,7 +23,7 @@ class Population:
           # Sortujemy osobniki według wartości funkcji celu
           self.best_individuals = sorted(
               self.individuals,  # Sortujemy całą populację
-              key=lambda individual: float(self.func([float(val) for val in individual.chromosom.decoded_chromosom])),
+              key=lambda individual: float(self.func([float(val) for val in individual.chromosom._decode_chromosom()])),
               reverse=self.optimum  # Jeśli maksymalizujemy, używamy reverse=True
           )
           
@@ -97,21 +40,21 @@ class Population:
 
         for _ in range(k):
             tournament = random.sample(self.individuals, int(self.population_size / k))  # Losujemy podzbiór
-            
+
             if self.optimum == 1:
-                best = max(tournament, key=lambda individual: float(self.func([float(val) for val in individual.chromosom.decoded_chromosom])))
+                best = max(tournament, key=lambda individual: float(self.func([float(val) for val in individual.chromosom._decode_chromosom()])))
             else:
-                best = min(tournament, key=lambda individual: float(self.func([float(val) for val in individual.chromosom.decoded_chromosom])))
+                best = min(tournament, key=lambda individual: float(self.func([float(val) for val in individual.chromosom._decode_chromosom()])))
 
             self.best_individuals.append(best)  # Teraz przechowujemy cały obiekt Individual
-
+            
 
     def getBestByRulet(self, percentage: float):
       """Zwraca najlepsze osobniki według metody ruletki jako listę obiektów Individual."""
       size = int(percentage * self.population_size / 100)  # Obliczamy liczbę osobników do wybrania
       self.best_individuals = []
 
-      cell = {individual: float(self.func([float(val) for val in individual.chromosom.decoded_chromosom])) for individual in self.individuals}
+      cell = {individual: float(self.func([float(val) for val in individual.chromosom._decode_chromosom()])) for individual in self.individuals}
 
       if self.optimum == 0:
           cell = {key: 1 / value for key, value in cell.items()}
@@ -147,14 +90,12 @@ class Population:
         child1_chromosoms = []
         child2_chromosoms = []
     
-        # print("Parent 1 chromosoms:", parent1.chromosom.chromosoms)
-        # print("Parent 2 chromosoms:", parent2.chromosom.chromosoms)
     
         # Iterujemy po każdej zmiennej w chromosomie (bo może być ich kilka)
         for p1_chromo, p2_chromo in zip(parent1.chromosom.chromosoms, parent2.chromosom.chromosoms):
             end_of_range = len(p1_chromo)
             k = random.randint(1, end_of_range - 1)  # Punkt krzyżowania (nie może być 0)
-            # print(f"Crossover point: {k}")
+
     
             # Tworzymy nowe chromosomy dzieci
             new_p1 = p1_chromo[:k] + p2_chromo[k:]
@@ -170,10 +111,7 @@ class Population:
         # Podmieniamy chromosomy na nowe
         child1.chromosom.chromosoms = child1_chromosoms
         child2.chromosom.chromosoms = child2_chromosoms
-    
-        # print("Child 1 chromosoms:", child1.chromosom.chromosoms)
-        # print("Child 2 chromosoms:", child2.chromosom.chromosoms)
-    
+        
         return child1, child2
     
     #krzyżowanie dwupunktowe
@@ -182,8 +120,6 @@ class Population:
         child1_chromosoms = []
         child2_chromosoms = []
     
-        # print("Parent 1 chromosoms:", parent1.chromosom.chromosoms)
-        # print("Parent 2 chromosoms:", parent2.chromosom.chromosoms)
     
         # Iterujemy po każdej zmiennej w chromosomie (bo może być ich kilka)
         for p1_chromo, p2_chromo in zip(parent1.chromosom.chromosoms, parent2.chromosom.chromosoms):
@@ -193,11 +129,9 @@ class Population:
                 point2 = random.randint(1, end_of_range - 1)
                 if point2 != point1 and abs(point2 - point1) >= min_gap:
                     break
-            # print(f"Crossover points: {point1} {point2}")
             
             lower = min(point1, point2)
             upper = max(point1, point2)
-            # print(lower, upper)
             # Tworzymy nowe chromosomy dzieci
             new_p1 = p1_chromo[:lower] + p2_chromo[lower:upper] + p1_chromo[upper:]
             new_p2 = p2_chromo[:lower] + p1_chromo[lower:upper] + p2_chromo[upper:]
@@ -213,8 +147,7 @@ class Population:
         child1.chromosom.chromosoms = child1_chromosoms
         child2.chromosom.chromosoms = child2_chromosoms
     
-        # print("Child 1 chromosoms:", child1.chromosom.chromosoms)
-        # print("Child 2 chromosoms:", child2.chromosom.chromosoms)
+
         
         return child1, child2
     
@@ -224,8 +157,6 @@ class Population:
         child1_chromosoms = []
         child2_chromosoms = []      
         
-        # print("Parent 1 chromosoms:", parent1.chromosom.chromosoms)
-        # print("Parent 2 chromosoms:", parent2.chromosom.chromosoms)
         
         for p1_chromo, p2_chromo in zip(parent1.chromosom.chromosoms, parent2.chromosom.chromosoms):
             child1_genes = []
@@ -233,7 +164,6 @@ class Population:
             
             for gene1, gene2 in zip(p1_chromo, p2_chromo):  
                 gene_random_rate = random.uniform(0, 1)
-                # print("Gene random rate:", gene_random_rate)
     
                 if gene_random_rate <= cross_probability:
                     # Zamieniamy geny
@@ -256,8 +186,7 @@ class Population:
         child1.chromosom.chromosoms = child1_chromosoms
         child2.chromosom.chromosoms = child2_chromosoms
     
-        # print("Child 1 chromosoms:", child1.chromosom.chromosoms)
-        # print("Child 2 chromosoms:", child2.chromosom.chromosoms)
+
         
         return child1, child2 
     
@@ -266,15 +195,12 @@ class Population:
         """Krzyżowanie ziarniste dla chromosomów binarnych."""
         child1prim_chromosoms = []   
         
-        print("Parent 1 chromosoms:", parent1.chromosom.chromosoms)
-        print("Parent 2 chromosoms:", parent2.chromosom.chromosoms)
         
         for p1_chromo, p2_chromo in zip(parent1.chromosom.chromosoms, parent2.chromosom.chromosoms):
             child1prim_genes = []
             
             for gene1, gene2 in zip(p1_chromo, p2_chromo):  
                 gene_random_rate = random.uniform(0, 1)
-                print("Gene random rate:", gene_random_rate)
     
                 if gene_random_rate <= 0.5:
                     child1prim_genes.append(gene1)
@@ -290,17 +216,21 @@ class Population:
         # Podmieniamy chromosomy na nowe
         child1prim.chromosom.chromosoms = child1prim_chromosoms
     
-        print("Child 1' chromosoms:", child1prim.chromosom.chromosoms)
         
         return child1prim, _
-    def population_after_crossover(self, crossover_method_number, crossover_rate=1.0, cross_probability=0.7):
+    def population_after_crossover(self, crossover_method_number, elite ,crossover_rate=1.0, cross_probability=0.7):
         """Wykonuje krzyżowanie dla całej populacji."""
         new_population = []
         selected_individuals = self.best_individuals[:]
         random.shuffle(selected_individuals)
+        needed_population_size = self.population_size - len(self.best_individuals) - elite
+        
+        if len(selected_individuals) % 2 != 0:
+            selected_individuals.append(random.choice(selected_individuals))
     
-        for i in range(0, len(selected_individuals) - 1, 2):
-            parent1, parent2 = selected_individuals[i], selected_individuals[i + 1]
+        for i in range(0, needed_population_size):
+            
+            parent1, parent2 = selected_individuals[i % len(selected_individuals)], selected_individuals[(i + 1) % len(selected_individuals)]
     
             if random.random() < crossover_rate:
                 if crossover_method_number == 1:
@@ -318,13 +248,8 @@ class Population:
             else:
                 new_population.extend([parent1, parent2])
     
-        self.best_individuals = new_population
+        self.best_individuals.extend(new_population)
 
-
-        
-    def getX(self) -> list:
-        """Zwraca listę fenotypów (wartości zmiennych)."""
-        return [[float(x) for x in individual.chromosom.decoded_chromosom] for individual in self.individuals]
 
     def __str__(self):
         return "\n".join(str(individual) for individual in self.individuals)
@@ -336,8 +261,6 @@ class Population:
                 c[0] = 0 if c[0] == 1 else 1
             else:
                 c[-1] = 0 if c[-1] == 1 else 1
-        
-        
 
     def mutate_one_point(self, individual):
         """Mutacja jednopunktowa – losowo zmienia jeden bit."""
@@ -385,29 +308,10 @@ class Population:
                     
                     c[idx1:idx2 + 1] = list(c[idx1:idx2 + 1])[::-1]
         
-        # print(self.individuals[0].chromosom.chromosoms)
-                    
-    # def fitness(self, individual: Individual) :
-    #     """Funkcja przystosowania, używa rzeczywistej funkcji celu.""" 
-    #     # w sumie nie wiem którą wersję wziąść
-        
-    #     return self.func(individual.chromosom._decode_chromosom())
-    #     return self.func(individual.chromosom.decoded_chromosom)
-    #     # return sum(x.count(1) for x in individual.chromosom.chromosoms) 
 
     def fitness(self, individual: Individual):
         """Funkcja przystosowania, używa rzeczywistej funkcji celu."""  
         decoded = individual.chromosom._decode_chromosom()
-        
-        # Debugowanie, aby zobaczyć, co zwraca dekodowanie
-        # print("Decoded Chromosome:", decoded, [type(x) for x in decoded])
-
-        # Sprawdzenie, czy wszystkie wartości są float lub Decimal
-        # try:
-        #     decoded = [float(x) for x in decoded]
-        #     # print(decoded)
-        # except ValueError:
-        #     raise ValueError(f"Błąd konwersji: {decoded}")
 
         return self.func(decoded)
 
@@ -425,36 +329,61 @@ class Population:
         return sorted_population[:elite_num]   
 
 
-
-
     
 if __name__ == "__main__": 
-    population = Population(2, 5, 5, -2, 2, lambda x: sum(xi ** 2 for xi in x), "min")
+    population = Population(2, 20, 5, -2, 2, lambda x: sum(xi ** 2 for xi in x), "min")
 
-
-    print(population.cell)
+    func =lambda x: sum(xi ** 2 for xi in x)
+    # print(population.cell)
     # print(population.individuals[0].chromosom.decoded_chromosom[0])
-    population.getBestBySelection(50)
+    # print(population.getSortedCell3())
+    
+    # print("-------------------------------------------------------")
+    # print(population.getCell())
+    
+    # print("-------------------------------------------------------")
+
+    # print(population.getSortedCell())
+    
+    # print("-------------------------------------------------------")
+
 
     # print(population.population_after_mutationr("Two Point"),1)
-    # print(population.best_individuals)
+    # print(population.best_individuals) 
+    elite =population.elitism()
+    population.getBestBySelection(10.0)
     for i in population.best_individuals:
-        print(i.chromosom.chromosoms)
+        
+        print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
         
     print("-------------------------------------------------------")
 
-    for i in population.getBestBySelection2(50):
-        print(i.chromosom.chromosoms)
-    # population.elitism(0.7)
+    # for i in population.getBestBySelection2(5.0):
+    #     print(i)
+    #     print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
+    # # population.elitism(0.7)
     # print("---------------------------------------------------------")
-
-    
-    # for ind in population.individuals:
-    #     print(f"Chromosom: {ind.chromosom.chromosoms}, Fitness: {population.fitness(ind)}")
-    # print("ccc---------------------------------------------------------ccc")
-
+    # population.getBestByRulet(5.0)
+    # for i in population.best_individuals:
+    #     print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
+    # # for ind in population.individuals:
+    # #     print(f"Chromosom: {ind.chromosom.chromosoms}, Fitness: {population.fitness(ind)}")
+    # # print("ccc---------------------------------------------------------ccc")
+    # print("---------------------------------------------------------")
+    # population.getBestByTournament(10,5)
+    # for i in population.best_individuals:
+    #     print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
+        
+    # print("---------------------------------------------------------")
         
     # elite =population.elitism()
     # print("\nWybrane elitarne osobniki:")
     # for ind in elite:
     #     print(f"Chromosom: {ind.chromosom.chromosoms}, Fitness: {population.fitness(ind)}")
+    
+    # print("---------------------------------------------------------")
+    # population.population_after_mutationr("One Point")
+    population.inversion(1)
+    population.individuals=population.best_individuals+elite
+    for i in population.individuals:
+        print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))

@@ -34,7 +34,7 @@ class PlotViewer:
         self.figures = []
         self.current_index = 0
 
-        # **🔹 Wykres 1: Najlepsza wartość funkcji celu od iteracji 🔹**
+        # **🔹 Wykres 1: Najlepsza wartość funkcji celu 🔹**
         fig1, ax1 = plt.subplots(figsize=(6, 4))
         ax1.plot(range(len(best_fitness_values)), best_fitness_values, marker='o', linestyle='-', color='red')
         ax1.set_xlabel("Iteracja")
@@ -43,7 +43,7 @@ class PlotViewer:
         ax1.grid(True)
         self.figures.append(fig1)
 
-        # **🔹 Wykres 2: Średnia wartość i odchylenie standardowe 🔹**
+        # **🔹 Wykres 2: Średnia wartość i odchylenie standardowe (obszar) 🔹**
         fig2, ax2 = plt.subplots(figsize=(6, 4))
         ax2.plot(range(len(avg_fitness_values)), avg_fitness_values, label="Średnia wartość", marker='o', linestyle='-', color='blue')
         ax2.fill_between(range(len(avg_fitness_values)),
@@ -56,6 +56,25 @@ class PlotViewer:
         ax2.legend()
         ax2.grid(True)
         self.figures.append(fig2)
+        #  -------------------------------------------------- od tad ---------------------------------------------------------------
+        # **🔹 Wykres 3: Średnia wartość funkcji celu 🔹**
+        fig3, ax3 = plt.subplots(figsize=(6, 4))
+        ax3.plot(range(len(avg_fitness_values)), avg_fitness_values, marker='o', linestyle='-', color='green')
+        ax3.set_xlabel("Iteracja")
+        ax3.set_ylabel("Średnia wartość funkcji")
+        ax3.set_title("Średnia wartość funkcji celu w kolejnych iteracjach")
+        ax3.grid(True)
+        self.figures.append(fig3)
+
+        # **🔹 Wykres 4: Odchylenie standardowe jako wykres liniowy 🔹**
+        fig4, ax4 = plt.subplots(figsize=(6, 4))
+        ax4.plot(range(len(std_fitness_values)), std_fitness_values, marker='o', linestyle='-', color='purple')
+        ax4.set_xlabel("Iteracja")
+        ax4.set_ylabel("Odchylenie standardowe")
+        ax4.set_title("Odchylenie standardowe w kolejnych iteracjach")
+        ax4.grid(True)
+        self.figures.append(fig4)
+        #  -------------------------------------------------- do tad ---------------------wykresy doane mozna usunaćjak niepotrzeben------------------------------------------
 
         # **🔹 Wyświetlanie wykresu 🔹**
         self.canvas = FigureCanvasTkAgg(self.figures[self.current_index], master=self.plot_window)
@@ -117,7 +136,8 @@ def start_algorithm():
     population_size = get_value(population_var, 50, int)
     epochs = get_value(epochs_var, 100, int)
     variables_count = get_value(params_var, 10, int)
-    elite_percent = get_value(elite_var, 10.0)
+    elite_percent = get_value(elite_percent_var, 10.0)/100
+    elite_count = elite_count_var.get() if elite_count_var.get() else None
     cross_prob = get_value(cross_prob_var, 0.8)
     mutation_prob = get_value(mutation_prob_var, 0.05)
     inversion_prob = get_value(inversion_prob_var, 0.01)
@@ -137,7 +157,7 @@ def start_algorithm():
         "Uniform crossover": 3,
         "Granular crossover": 4
     }
-    
+
     func = get_function(function_name, variables_count)
     
     population = Population(variables_count, population_size, precision, start_, end_, func, "max" if is_maximization else "min")
@@ -145,15 +165,19 @@ def start_algorithm():
     best_fitness_values = []
     avg_fitness_values = []
     std_fitness_values = []
-
+    elite_individuals = []
     # Zarejestruj czas początkowy
     start_time = time.time()
 
     for _ in range(epochs):
         
         # Elitaryzm
-        elite_individuals = population.elitism(elite_percent)
+        # elite_individuals.extend(population.elitism(elite_percent,elite_count))
+        elite_individuals=population.elitism(elite_percent,elite_count)
+        # print(len(elite_individuals))
+        
         # population.individuals.extend(elite_individuals)
+        
         
         # Selekcja
         # Selekcja - wybór najlepszych osobników
@@ -175,6 +199,7 @@ def start_algorithm():
         population.population_after_crossover(
             crossover_method_number=crossover_method_number, 
             crossover_rate=cross_prob, 
+            elite=len(elite_individuals),
             cross_probability=cross_probability
         )
 
@@ -185,22 +210,6 @@ def start_algorithm():
         # Inwersja
         population.inversion(inversion_prob)
         # print(population.individuals)
-        
-       # Obliczanie wartości funkcji celu dla populacji
-        fitness_sorted = population.getSortedCell()
-
-
-        # # Pobiera tylko same wartości fitness (drugi element każdej krotki)
-        # fitness_values = [fitness for _, fitness in fitness_sorted]
-        #
-        # # Obliczanie metryk fitness
-        # best_fitness_values.append(fitness_values[0])  # Najlepsza wartość fitness (pierwszy element w posortowanej liście)
-        # avg_fitness = sum(fitness_values) / len(fitness_values)  # Średnia wartość fitness
-        # avg_fitness_values.append(avg_fitness)
-        #
-        # # Odchylenie standardowe fitness
-        # std_fitness = (sum((x - avg_fitness) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5
-        # std_fitness_values.append(std_fitness)
 
         
         fitness_values = [float(population.fitness(individual)) for individual in population.individuals]
@@ -212,9 +221,18 @@ def start_algorithm():
         std_fitness_values.append((sum((x - avg_fitness_values[-1]) ** 2 for x in fitness_values) / len(fitness_values)) ** 0.5)  # Odchylenie standardowe
         
         population.individuals=population.best_individuals
-
         population.individuals.extend(elite_individuals)
+        
+        # population.population_size = len(population.individuals)
 
+        # print(len(population.individuals))
+
+
+    # print(len(elite_individuals))
+    # for i in population.individuals:
+    #     # print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
+    #     print(func(i.chromosom._decode_chromosom()))
+        
 
     # Zarejestruj czas zakończenia
     end_time = time.time()
@@ -259,7 +277,9 @@ precision_var = tk.StringVar(value=4)
 population_var = tk.StringVar(value=50)
 epochs_var = tk.StringVar(value=100)
 
-elite_var = tk.StringVar(value=10.0)
+elite_percent_var = tk.StringVar(value=10.0)
+elite_count_var = tk.StringVar()
+
 cross_prob_var = tk.StringVar(value=0.8)
 mutation_prob_var = tk.StringVar(value=0.05)
 inversion_prob_var = tk.StringVar(value=0.01)
@@ -270,7 +290,7 @@ tournament_var = tk.StringVar(value=3)
 cross_probability_var = tk.StringVar(value=0.7)
 
 params_var = tk.StringVar(value="10")
-choices = ["10", "20", "30", "50", "100"]
+# choices = ["10", "20", "30", "50", "100"]
 
 # Tworzenie list rozwijanych
 selection_var = tk.StringVar(value="Roulette Wheel")
@@ -295,8 +315,9 @@ fields = [
     ("Precision", precision_var),
     ("Population", population_var),
     ("Epochs", epochs_var),
-    # ("Number of parameters", params_var),
-    ("Percentage elite strategy", elite_var),
+    ("Number of parameters", params_var),
+    ("Percentage elite strategy", elite_percent_var),
+    ("Count elite strategy", elite_count_var),
     # ("Cross probability", cross_prob_var),
     ("Mutation probability", mutation_prob_var),
     ("Inversion probability", inversion_prob_var),
@@ -308,9 +329,9 @@ for i, (label, var) in enumerate(fields):
     tk.Entry(frame, textvariable=var, width=15).grid(row=i, column=1, padx=5, pady=2)
 
 # Listy rozwijane
-tk.Label(frame, text="Number of parameters", anchor="w", width=23).grid(row=11, column=0, padx=0, pady=2)
-dropdown = tk.OptionMenu(frame, params_var, *choices)
-dropdown.grid(row=11, column=1)
+# tk.Label(frame, text="Number of parameters", anchor="w", width=23).grid(row=11, column=0, padx=0, pady=2)
+# dropdown = tk.OptionMenu(frame, params_var, *choices)
+# dropdown.grid(row=11, column=1)
 
 select_frame1 = tk.Frame(root)
 select_frame1.pack(pady=0)
@@ -355,12 +376,12 @@ select_frame.pack(pady=0)
 
 tk.Label(select_frame, text="Mutation method", anchor="w", width=25).grid(row=1, column=0)
 mutation_method_combobox = ttk.Combobox(select_frame, textvariable=mutation_method_var, values=["Boundary", "One-Point", "Two-Point"], width=15)
-mutation_method_combobox.grid(row=2, column=1)
+mutation_method_combobox.grid(row=1, column=1)
 mutation_method_combobox.state(["readonly"]) 
 
 tk.Label(select_frame, text="Function to calculation", anchor="w", width=25).grid(row=2, column=0)
 function_combobox = ttk.Combobox(select_frame, textvariable=function_var, values=["Hypersphere", "Rotated High Conditioned Elliptic Function"], width=15)
-function_combobox.grid(row=3, column=1)
+function_combobox.grid(row=2, column=1)
 function_combobox.state(["readonly"])
 
 # Radio buttony dla minimalizacji/maksymalizacji
@@ -381,7 +402,7 @@ def save_results_csv(filename, best_fitness_values, avg_fitness_values, std_fitn
     """Zapisuje wyniki algorytmu do pliku CSV."""
     with open(filename, mode='w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(["Iteracja", "Najlepsza wartość", "Średnia wartość", "Odchylenie standardowe"])
+        writer.writerow(["Iteracja", "Najlepsza wartosc", "Srednia wartosc", "Odchylenie standardowe"])
         for i, (best, avg, std) in enumerate(zip(best_fitness_values, avg_fitness_values, std_fitness_values)):
             writer.writerow([i, best, avg, std])
     print(f"Wyniki zapisano do pliku: {filename}")

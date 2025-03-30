@@ -11,7 +11,7 @@ class Chromosom:
         self.end_ = end_
         self.chromosom_len = ceil(self.precision * log2(self.end_ - self.start_))
         self.chromosoms = self._generate_chromosom()
-        self.decoded_chromosom = self._decode_chromosom()
+      
 
     def _generate_chromosom(self) -> list:
       chromosoms = []
