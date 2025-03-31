@@ -76,6 +76,36 @@ class PlotViewer:
         self.figures.append(fig4)
         #  -------------------------------------------------- do tad ---------------------wykresy doane mozna usunaćjak niepotrzeben------------------------------------------
 
+        # Wykres 5: Heatmapa funkcji Hypersphere
+        fig3, ax3 = plt.subplots(figsize=(6, 4))
+        x_min, x_max, y_min, y_max, resolution = -50, 50, -50, 50, 100
+        x = np.linspace(x_min, x_max, resolution)
+        y = np.linspace(y_min, y_max, resolution)
+        X, Y = np.meshgrid(x, y)
+        Z = X**2 + Y**2
+        heatmap = ax3.contourf(X, Y, Z, levels=50, cmap="plasma")
+        fig3.colorbar(heatmap, ax=ax3, label="Wartość funkcji")
+        ax3.scatter(0, 0, color="red", marker="x", s=100, label="Minimum (0,0)")
+        ax3.scatter(25, -34.6, color="blue", marker="o", s=100, label="Punkt (25,-34.6)")
+        ax3.set_xlabel("X")
+        ax3.set_ylabel("Y")
+        ax3.set_title("Heatmapa funkcji Hypersphere")
+        ax3.legend()
+        self.figures.append(fig3)
+
+        # Wykres 6: Wykres 3D funkcji Hypersphere
+        fig4 = plt.figure(figsize=(6, 4))
+        ax4 = fig4.add_subplot(111, projection='3d')
+        ax4.plot_surface(X, Y, Z, cmap='plasma', edgecolor='none')
+        ax4.scatter(0, 0, 0, color='red', marker='x', s=100, label="Minimum (0,0,0)")
+        ax4.scatter(25, -34.6, (25)**2 + (-34.6)**2, color='blue', marker='o', s=100, label='Punkt (25,-34.6)')
+        ax4.set_xlabel("X")
+        ax4.set_ylabel("Y")
+        ax4.set_zlabel("Z (Wartość funkcji)")
+        ax4.set_title("Wykres 3D funkcji Hypersphere")
+        ax4.legend()
+        self.figures.append(fig4)
+
         # **🔹 Wyświetlanie wykresu 🔹**
         self.canvas = FigureCanvasTkAgg(self.figures[self.current_index], master=self.plot_window)
         self.plot_widget = self.canvas.get_tk_widget()
