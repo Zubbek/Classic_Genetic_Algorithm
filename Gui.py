@@ -3,11 +3,11 @@ from tkinter import ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
-from decimal import getcontext
 import time
 import benchmark_functions as bf
 from opfunu.cec_based.cec2014 import F12014
 from Population import Population
+import csv
 
 def get_function(name, ndim):
     """Zwraca wybraną funkcję testową na podstawie jej nazwy."""
@@ -16,6 +16,15 @@ def get_function(name, ndim):
     elif name == "Rotated High Conditioned Elliptic Function":
         func = F12014(ndim=ndim)
         return func.evaluate
+
+def save_results_csv(filename, best_fitness_values, avg_fitness_values, std_fitness_values):
+    """Zapisuje wyniki algorytmu do pliku CSV."""
+    with open(filename, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Iteracja", "Najlepsza wartosc", "Srednia wartosc", "Odchylenie standardowe"])
+        for i, (best, avg, std) in enumerate(zip(best_fitness_values, avg_fitness_values, std_fitness_values)):
+            writer.writerow([i, best, avg, std])
+    print(f"Wyniki zapisano do pliku: {filename}")
 
 class PlotViewer:
     def __init__(self, root, best_fitness_values, avg_fitness_values, std_fitness_values):
@@ -357,19 +366,6 @@ tk.Radiobutton(radio_frame, text="Maximization", variable=maximization_var, valu
 
 # Przycisk startowy
 tk.Button(root, text="Start", command=start_algorithm, width=7, height=1).pack(pady=10)
-
-# zapis do pliku
-import csv
-
-def save_results_csv(filename, best_fitness_values, avg_fitness_values, std_fitness_values):
-    """Zapisuje wyniki algorytmu do pliku CSV."""
-    with open(filename, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Iteracja", "Najlepsza wartosc", "Srednia wartosc", "Odchylenie standardowe"])
-        for i, (best, avg, std) in enumerate(zip(best_fitness_values, avg_fitness_values, std_fitness_values)):
-            writer.writerow([i, best, avg, std])
-    print(f"Wyniki zapisano do pliku: {filename}")
-
 
 # Uruchomienie aplikacji
 root.mainloop()
