@@ -217,7 +217,7 @@ class Population:
         child1prim.chromosom.chromosoms = child1prim_chromosoms
     
         
-        return child1prim, _
+        return child1prim
     def population_after_crossover(self, crossover_method_number, elite ,crossover_rate=1.0, cross_probability=0.7):
         """Wykonuje krzyżowanie dla całej populacji."""
         new_population = []
@@ -227,9 +227,9 @@ class Population:
         
         if len(selected_individuals) % 2 != 0:
             selected_individuals.append(random.choice(selected_individuals))
-            selected_individuals+=1
-    
-        for i in range(0, needed_population_size,2):
+
+        i=0
+        while len(new_population)<needed_population_size:
             
             parent1, parent2 = selected_individuals[i % len(selected_individuals)], selected_individuals[(i + 1) % len(selected_individuals)]
     
@@ -243,11 +243,16 @@ class Population:
                 elif crossover_method_number == 4:
                     child1 = self.discrete_crossover(parent1, parent2)
                 if len(new_population)+1<needed_population_size:
-                    new_population.extend([child1, child2])  
+                    try:
+                        new_population.extend([child1, child2])  
+                    except Exception as e:
+                        new_population.extend([child1]) 
                 else:
                     new_population.extend([child1]) 
             else:
                 new_population.extend([parent1, parent2])
+            
+            i+=2
                 
         self.best_individuals.extend(new_population)
 
@@ -328,7 +333,7 @@ class Population:
 
     
 if __name__ == "__main__": 
-    population = Population(2, 23, 5, -2, 2, lambda x: sum(xi ** 2 for xi in x), "min")
+    population = Population(2, 15, 5, -2, 2, lambda x: sum(xi ** 2 for xi in x), "min")
 
     func =lambda x: sum(xi ** 2 for xi in x)
     # print(population.cell)
@@ -346,9 +351,9 @@ if __name__ == "__main__":
 
 
     # print(population.population_after_mutationr("Two Point"),1)
-    # print(population.best_individuals) 
+    # print(population.best_individuals) over
     print(len(population.individuals))
-    elite =population.elitism(0.1)
+    elite =population.elitism(0.25)
     print("elite",len(elite))
     population.getBestBySelection(10.0)
     for i in population.best_individuals:
@@ -356,7 +361,7 @@ if __name__ == "__main__":
         print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
         
     print("-------------------------------------------------------")
-    print(population.population_after_crossover(1,len(elite)))
+    print(population.population_after_crossover(4,len(elite)))
     print(len(population.best_individuals))
     
     # population.inversion(1)
