@@ -227,8 +227,9 @@ class Population:
         
         if len(selected_individuals) % 2 != 0:
             selected_individuals.append(random.choice(selected_individuals))
+            selected_individuals+=1
     
-        for i in range(0, needed_population_size):
+        for i in range(0, needed_population_size,2):
             
             parent1, parent2 = selected_individuals[i % len(selected_individuals)], selected_individuals[(i + 1) % len(selected_individuals)]
     
@@ -241,13 +242,13 @@ class Population:
                     child1, child2 = self.uniform_crossover(parent1, parent2, cross_probability)
                 elif crossover_method_number == 4:
                     child1 = self.discrete_crossover(parent1, parent2)
-                try:
+                if len(new_population)+1<needed_population_size:
                     new_population.extend([child1, child2])  
-                except Exception as e:
+                else:
                     new_population.extend([child1]) 
             else:
                 new_population.extend([parent1, parent2])
-    
+                
         self.best_individuals.extend(new_population)
 
 
@@ -279,32 +280,28 @@ class Population:
 
 
     def population_after_mutationr(self, mutation_method, mutation_rate=1.0):
-        new_population = []
-        individuals = self.best_individuals[:]
+
         # random.shuffle(individuals)
         
-        for i in range(0, len(individuals)):
+        for i in range(0, len(self.best_individuals)):
 
             if random.random() < mutation_rate:
                 if mutation_method == "One Point":
-                    self.mutate_one_point(individuals[i])
+                    self.mutate_one_point(self.best_individuals[i])
                 elif mutation_method == "Two Point":
-                    self.mutate_two_point(individuals[i])
+                    self.mutate_two_point(self.best_individuals[i])
                 elif mutation_method == "Boundary":
-                   self.mutate_boundary(individuals[i])
+                   self.mutate_boundary(self.best_individuals[i])
 
-        # print(self.individuals[0].chromosom.chromosoms)
-        self.individuals
-        
+        # print(self.individuals[0].chromosom.chromosoms)        
     def inversion(self, inversion_rate):
         """Operator inwersji – losowo odwraca fragment chromosomu z określonym prawdopodobieństwem."""
 
-        for individual in self.best_individuals[:]:
+        for individual in self.best_individuals:
 
             for c in individual.chromosom.chromosoms:
                 if random.random() < inversion_rate:
                     idx1, idx2 = sorted(random.sample(range(len(c)), 2))
-
                     
                     c[idx1:idx2 + 1] = list(c[idx1:idx2 + 1])[::-1]
         
@@ -331,7 +328,7 @@ class Population:
 
     
 if __name__ == "__main__": 
-    population = Population(2, 20, 5, -2, 2, lambda x: sum(xi ** 2 for xi in x), "min")
+    population = Population(2, 23, 5, -2, 2, lambda x: sum(xi ** 2 for xi in x), "min")
 
     func =lambda x: sum(xi ** 2 for xi in x)
     # print(population.cell)
@@ -350,13 +347,24 @@ if __name__ == "__main__":
 
     # print(population.population_after_mutationr("Two Point"),1)
     # print(population.best_individuals) 
-    elite =population.elitism()
+    print(len(population.individuals))
+    elite =population.elitism(0.1)
+    print("elite",len(elite))
     population.getBestBySelection(10.0)
     for i in population.best_individuals:
         
         print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
         
     print("-------------------------------------------------------")
+    print(population.population_after_crossover(1,len(elite)))
+    print(len(population.best_individuals))
+    
+    # population.inversion(1)
+    # for i in population.best_individuals:
+        
+    #     print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
+        
+    # print("-------------------------------------------------------")
 
     # for i in population.getBestBySelection2(5.0):
     #     print(i)
@@ -383,7 +391,7 @@ if __name__ == "__main__":
     
     # print("---------------------------------------------------------")
     # population.population_after_mutationr("One Point")
-    population.inversion(1)
-    population.individuals=population.best_individuals+elite
-    for i in population.individuals:
-        print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
+    # population.inversion(1)
+    # population.individuals=population.best_individuals+elite
+    # for i in population.individuals:
+    #     print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
