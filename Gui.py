@@ -25,7 +25,7 @@ def get_function(name, ndim):
 # od wyukresów aby sie dało przewijać - jescze do dopracowania------------------------------------------------------------------
 
 class PlotViewer:
-    def __init__(self, root, best_fitness_values, avg_fitness_values, std_fitness_values):
+    def __init__(self, root, best_fitness_values, avg_fitness_values, std_fitness_values, function_name, min, max, x_best, y_best):
         """Klasa do wyświetlania wykresów wyników algorytmu genetycznego."""
         self.plot_window = tk.Toplevel(root)
         self.plot_window.title("Wykresy Algorytmu Genetycznego")
@@ -75,6 +75,41 @@ class PlotViewer:
         ax4.grid(True)
         self.figures.append(fig4)
         #  -------------------------------------------------- do tad ---------------------wykresy doane mozna usunaćjak niepotrzeben------------------------------------------
+        
+        # Wykres 5: Heatmapa funkcji Hypersphere
+        fig3, ax3 = plt.subplots(figsize=(6, 4))
+        x_min, x_max, y_min, y_max, resolution = min, max, min, max, 100
+        x = np.linspace(x_min, x_max, resolution)
+        y = np.linspace(y_min, y_max, resolution)
+        X, Y = np.meshgrid(x, y)
+        if function_name == "Hypersphere":
+            Z = X**2 + Y**2
+        elif function_name == "Rotated High Conditioned Elliptic Function":
+            Z = theta = np.pi / 4
+            X_rot = X * np.cos(theta) - Y * np.sin(theta)
+            Y_rot = X * np.sin(theta) + Y * np.cos(theta)
+            Z = X_rot**2 + 10**6 * Y_rot**2
+        heatmap = ax3.contourf(X, Y, Z, levels=50, cmap="plasma")
+        fig3.colorbar(heatmap, ax=ax3, label="Wartość funkcji")
+        ax3.scatter(0, 0, color="red", marker="x", s=100, label="Minimum (0,0)")
+        ax3.scatter(x_best, y_best, color="blue", marker="o", s=100, label=f"Punkt ({x_best},{y_best})")
+        ax3.set_xlabel("X")
+        ax3.set_ylabel("Y")
+        ax3.set_title("Heatmapa funkcji Hypersphere")
+        ax3.legend()
+        self.figures.append(fig3)
+
+        # Wykres 6: Wykres 3D funkcji Hypersphere
+        fig4 = plt.figure(figsize=(6, 4))
+        ax4 = fig4.add_subplot(111, projection='3d')
+        ax4.plot_surface(X, Y, Z, cmap='plasma', edgecolor='none')
+        ax4.scatter(x_best, y_best, best_fitness_values[-1], color='blue', marker='o', s=100, label=f"Punkt ({x_best},{y_best})")
+        ax4.set_xlabel("X")
+        ax4.set_ylabel("Y")
+        ax4.set_zlabel("Z (Wartość funkcji)")
+        ax4.set_title("Wykres 3D funkcji Hypersphere")
+        ax4.legend()
+        self.figures.append(fig4)
 
         # **🔹 Wyświetlanie wykresu 🔹**
         self.canvas = FigureCanvasTkAgg(self.figures[self.current_index], master=self.plot_window)
@@ -232,7 +267,14 @@ def start_algorithm():
     # for i in population.individuals:
     #     # print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
     #     print(func(i.chromosom._decode_chromosom()))
-        
+
+    if population.best_individuals:
+        # Załóżmy, że najlepszy osobnik znajduje się na pozycji 0
+        best_individual = population.best_individuals[0]
+        best_point = best_individual.chromosom._decode_chromosom()
+        print("Najlepszy punkt:", best_point)
+    else:
+        best_point = None
 
     # Zarejestruj czas zakończenia
     end_time = time.time()
@@ -240,7 +282,7 @@ def start_algorithm():
     # Oblicz czas działania algorytmu
     elapsed_time = end_time - start_time
     # Wyświetlenie wyników na wykresie
-    plot_viewer = PlotViewer(root, best_fitness_values, avg_fitness_values, std_fitness_values)
+    plot_viewer = PlotViewer(root, best_fitness_values, avg_fitness_values, std_fitness_values, function_name, start_, end_, best_point[0], best_point[1])
 
     # Dodaj etykietę z czasem wykonania pod wykresami
     time_label = tk.Label(plot_viewer.plot_window, text=f"Czas działania algorytmu: {elapsed_time:.4f} sekundy", font=("Arial", 12))
