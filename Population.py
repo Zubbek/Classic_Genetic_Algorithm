@@ -1,8 +1,5 @@
 import random
-from math import log2, ceil
-from decimal import Decimal
 from Individual import Individual
-
 
 class Population:
     def __init__(self, variables_count, population_size, precision, start_, end_, func, optimum):
@@ -13,8 +10,6 @@ class Population:
         self.optimum = 0 if optimum == "min" else 1
         self.precision = precision
         self.best_individuals = []
-
-
 
     def getBestBySelection(self, percentage: float):
           """Zwraca najlepsze osobniki jako listę obiektów Individual."""
@@ -285,9 +280,6 @@ class Population:
 
 
     def population_after_mutationr(self, mutation_method, mutation_rate=1.0):
-
-        # random.shuffle(individuals)
-        
         for i in range(0, len(self.best_individuals)):
 
             if random.random() < mutation_rate:
@@ -298,7 +290,6 @@ class Population:
                 elif mutation_method == "Boundary":
                    self.mutate_boundary(self.best_individuals[i])
 
-        # print(self.individuals[0].chromosom.chromosoms)        
     def inversion(self, inversion_rate):
         """Operator inwersji – losowo odwraca fragment chromosomu z określonym prawdopodobieństwem."""
 
@@ -329,74 +320,3 @@ class Population:
 
 
         return sorted_population[:elite_num]   
-
-
-    
-if __name__ == "__main__": 
-    population = Population(2, 15, 5, -2, 2, lambda x: sum(xi ** 2 for xi in x), "min")
-
-    func =lambda x: sum(xi ** 2 for xi in x)
-    # print(population.cell)
-    # print(population.individuals[0].chromosom.decoded_chromosom[0])
-    # print(population.getSortedCell3())
-    
-    # print("-------------------------------------------------------")
-    # print(population.getCell())
-    
-    # print("-------------------------------------------------------")
-
-    # print(population.getSortedCell())
-    
-    # print("-------------------------------------------------------")
-
-
-    # print(population.population_after_mutationr("Two Point"),1)
-    # print(population.best_individuals) over
-    print(len(population.individuals))
-    elite =population.elitism(0.25)
-    print("elite",len(elite))
-    population.getBestBySelection(10.0)
-    for i in population.best_individuals:
-        
-        print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
-        
-    print("-------------------------------------------------------")
-    print(population.population_after_crossover(4,len(elite)))
-    print(len(population.best_individuals))
-    
-    # population.inversion(1)
-    # for i in population.best_individuals:
-        
-    #     print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
-        
-    # print("-------------------------------------------------------")
-
-    # for i in population.getBestBySelection2(5.0):
-    #     print(i)
-    #     print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
-    # # population.elitism(0.7)
-    # print("---------------------------------------------------------")
-    # population.getBestByRulet(5.0)
-    # for i in population.best_individuals:
-    #     print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
-    # # for ind in population.individuals:
-    # #     print(f"Chromosom: {ind.chromosom.chromosoms}, Fitness: {population.fitness(ind)}")
-    # # print("ccc---------------------------------------------------------ccc")
-    # print("---------------------------------------------------------")
-    # population.getBestByTournament(10,5)
-    # for i in population.best_individuals:
-    #     print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
-        
-    # print("---------------------------------------------------------")
-        
-    # elite =population.elitism()
-    # print("\nWybrane elitarne osobniki:")
-    # for ind in elite:
-    #     print(f"Chromosom: {ind.chromosom.chromosoms}, Fitness: {population.fitness(ind)}")
-    
-    # print("---------------------------------------------------------")
-    # population.population_after_mutationr("One Point")
-    # population.inversion(1)
-    # population.individuals=population.best_individuals+elite
-    # for i in population.individuals:
-    #     print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))

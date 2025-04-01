@@ -3,15 +3,11 @@ from tkinter import ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
-from decimal import Decimal, getcontext
-import math
+from decimal import getcontext
 import time
 import benchmark_functions as bf
 from opfunu.cec_based.cec2014 import F12014
 from Population import Population
-
-#  potem do dodania jak wybierzemy --------------------------------------------------------------------------------
-getcontext().prec = 50 
 
 def get_function(name, ndim):
     """Zwraca wybraną funkcję testową na podstawie jej nazwy."""
@@ -21,11 +17,8 @@ def get_function(name, ndim):
         func = F12014(ndim=ndim)
         return func.evaluate
 
-
-# od wyukresów aby sie dało przewijać - jescze do dopracowania------------------------------------------------------------------
-
 class PlotViewer:
-    def __init__(self, root, best_fitness_values, avg_fitness_values, std_fitness_values, function_name, min, max, x_best, y_best):
+    def __init__(self, root, best_fitness_values, avg_fitness_values, std_fitness_values):
         """Klasa do wyświetlania wykresów wyników algorytmu genetycznego."""
         self.plot_window = tk.Toplevel(root)
         self.plot_window.title("Wykresy Algorytmu Genetycznego")
@@ -56,7 +49,7 @@ class PlotViewer:
         ax2.legend()
         ax2.grid(True)
         self.figures.append(fig2)
-        #  -------------------------------------------------- od tad ---------------------------------------------------------------
+
         # **🔹 Wykres 3: Średnia wartość funkcji celu 🔹**
         fig3, ax3 = plt.subplots(figsize=(6, 4))
         ax3.plot(range(len(avg_fitness_values)), avg_fitness_values, marker='o', linestyle='-', color='green')
@@ -73,42 +66,6 @@ class PlotViewer:
         ax4.set_ylabel("Odchylenie standardowe")
         ax4.set_title("Odchylenie standardowe w kolejnych iteracjach")
         ax4.grid(True)
-        self.figures.append(fig4)
-        #  -------------------------------------------------- do tad ---------------------wykresy doane mozna usunaćjak niepotrzeben------------------------------------------
-        
-        # Wykres 5: Heatmapa funkcji Hypersphere
-        fig3, ax3 = plt.subplots(figsize=(6, 4))
-        x_min, x_max, y_min, y_max, resolution = min, max, min, max, 100
-        x = np.linspace(x_min, x_max, resolution)
-        y = np.linspace(y_min, y_max, resolution)
-        X, Y = np.meshgrid(x, y)
-        if function_name == "Hypersphere":
-            Z = X**2 + Y**2
-        elif function_name == "Rotated High Conditioned Elliptic Function":
-            Z = theta = np.pi / 4
-            X_rot = X * np.cos(theta) - Y * np.sin(theta)
-            Y_rot = X * np.sin(theta) + Y * np.cos(theta)
-            Z = X_rot**2 + 10**6 * Y_rot**2
-        heatmap = ax3.contourf(X, Y, Z, levels=50, cmap="plasma")
-        fig3.colorbar(heatmap, ax=ax3, label="Wartość funkcji")
-        ax3.scatter(0, 0, color="red", marker="x", s=100, label="Minimum (0,0)")
-        ax3.scatter(x_best, y_best, color="blue", marker="o", s=100, label=f"Punkt ({x_best},{y_best})")
-        ax3.set_xlabel("X")
-        ax3.set_ylabel("Y")
-        ax3.set_title("Heatmapa funkcji Hypersphere")
-        ax3.legend()
-        self.figures.append(fig3)
-
-        # Wykres 6: Wykres 3D funkcji Hypersphere
-        fig4 = plt.figure(figsize=(6, 4))
-        ax4 = fig4.add_subplot(111, projection='3d')
-        ax4.plot_surface(X, Y, Z, cmap='plasma', edgecolor='none')
-        ax4.scatter(x_best, y_best, best_fitness_values[-1], color='blue', marker='o', s=100, label=f"Punkt ({x_best},{y_best})")
-        ax4.set_xlabel("X")
-        ax4.set_ylabel("Y")
-        ax4.set_zlabel("Z (Wartość funkcji)")
-        ax4.set_title("Wykres 3D funkcji Hypersphere")
-        ax4.legend()
         self.figures.append(fig4)
 
         # **🔹 Wyświetlanie wykresu 🔹**
@@ -153,7 +110,6 @@ class PlotViewer:
         self.prev_button.config(state="normal" if self.current_index > 0 else "disabled")
         self.next_button.config(state="normal" if self.current_index < len(self.figures) - 1 else "disabled")
 
-#  tutaj obsłużyc te wszystki ecklasy i funkcje jak wiesz co twoja klasa robi to mozesz dopisać -------------------------------- ---------------  
 def start_algorithm():
     """Uruchamia algorytm genetyczny z wartościami z GUI."""
     def get_value(var, default, cast_type=float):
@@ -207,13 +163,8 @@ def start_algorithm():
     for _ in range(epochs):
         
         # Elitaryzm
-        # elite_individuals.extend(population.elitism(elite_percent,elite_count))
         elite_individuals=population.elitism(elite_percent,elite_count)
-        # print(len(elite_individuals))
-        
-        # population.individuals.extend(elite_individuals)
-        
-        
+    
         # Selekcja
         # Selekcja - wybór najlepszych osobników
         if selection_method == "Roulette Wheel":
@@ -224,8 +175,6 @@ def start_algorithm():
 
         elif selection_method == "Best solution":
             population.getBestBySelection(best_select_percent)
-            
-        # population.individuals =selected_individuals
                 
         # Krzyżowanie
         crossover_method_number = crossover_mapping.get(cross_method, 1)
@@ -244,8 +193,6 @@ def start_algorithm():
                 
         # Inwersja
         population.inversion(inversion_prob)
-        # print(population.individuals)
-
         
         fitness_values = [float(population.fitness(individual)) for individual in population.individuals]
         if is_maximization:
@@ -257,24 +204,6 @@ def start_algorithm():
         
         population.individuals=population.best_individuals
         population.individuals.extend(elite_individuals)
-        
-        # population.population_size = len(population.individuals)
-
-        # print(len(population.individuals))
-
-
-    # print(len(elite_individuals))
-    # for i in population.individuals:
-    #     # print(i.chromosom.chromosoms, " ", func(i.chromosom._decode_chromosom()))
-    #     print(func(i.chromosom._decode_chromosom()))
-
-    if population.best_individuals:
-        # Załóżmy, że najlepszy osobnik znajduje się na pozycji 0
-        best_individual = population.best_individuals[0]
-        best_point = best_individual.chromosom._decode_chromosom()
-        print("Najlepszy punkt:", best_point)
-    else:
-        best_point = None
 
     # Zarejestruj czas zakończenia
     end_time = time.time()
@@ -282,13 +211,11 @@ def start_algorithm():
     # Oblicz czas działania algorytmu
     elapsed_time = end_time - start_time
     # Wyświetlenie wyników na wykresie
-    plot_viewer = PlotViewer(root, best_fitness_values, avg_fitness_values, std_fitness_values, function_name, start_, end_, best_point[0], best_point[1])
+    plot_viewer = PlotViewer(root, best_fitness_values, avg_fitness_values, std_fitness_values)
 
     # Dodaj etykietę z czasem wykonania pod wykresami
     time_label = tk.Label(plot_viewer.plot_window, text=f"Czas działania algorytmu: {elapsed_time:.4f} sekundy", font=("Arial", 12))
     time_label.pack(pady=10)
-
-# to tam mało istotne co jest niżej ----------------------------------------------------------------------------------------------
 
 def update_tournament_visibility(*args):
     """Pokazuje pole 'Tournament size' tylko jeśli wybrano 'Tournament'."""
@@ -332,7 +259,6 @@ tournament_var = tk.StringVar(value=3)
 cross_probability_var = tk.StringVar(value=0.7)
 
 params_var = tk.StringVar(value="10")
-# choices = ["10", "20", "30", "50", "100"]
 
 # Tworzenie list rozwijanych
 selection_var = tk.StringVar(value="Roulette Wheel")
@@ -369,11 +295,6 @@ fields = [
 for i, (label, var) in enumerate(fields):
     tk.Label(frame, text=label, anchor="w", width=23).grid(row=i, column=0, padx=0, pady=2)
     tk.Entry(frame, textvariable=var, width=15).grid(row=i, column=1, padx=5, pady=2)
-
-# Listy rozwijane
-# tk.Label(frame, text="Number of parameters", anchor="w", width=23).grid(row=11, column=0, padx=0, pady=2)
-# dropdown = tk.OptionMenu(frame, params_var, *choices)
-# dropdown.grid(row=11, column=1)
 
 select_frame1 = tk.Frame(root)
 select_frame1.pack(pady=0)
