@@ -5,7 +5,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 import time
 import benchmark_functions as bf
-from opfunu.cec_based.cec2014 import F12014
+from opfunu.cec_based.cec2014 import F132014
 from Population import Population
 import csv
 
@@ -13,8 +13,8 @@ def get_function(name, ndim):
     """Zwraca wybraną funkcję testową na podstawie jej nazwy."""
     if name == "Hypersphere":
         return bf.Hypersphere(n_dimensions=ndim)
-    elif name == "Rotated High Conditioned Elliptic Function":
-        func = F12014(ndim=ndim)
+    elif name == "Shifted and Rotated HappyCat Function":
+        func = F132014(ndim=ndim)
         return func.evaluate
 
 def save_results_csv(filename, best_fitness_values, avg_fitness_values, std_fitness_values):
@@ -130,11 +130,11 @@ def start_algorithm():
             return default
 
     # Pobieranie wartości z GUI lub użycie domyślnych
-    start_ = get_value(begin_var, -10.0)
-    end_ = get_value(end_var, 10.0)
+    start_ = get_value(begin_var, -50.0)
+    end_ = get_value(end_var, 50.0)
     precision = get_value(precision_var, 4, int)
     population_size = get_value(population_var, 50, int)
-    epochs = get_value(epochs_var, 100, int)
+    epochs = get_value(epochs_var, 500, int)
     variables_count = get_value(params_var, 10, int)
     elite_percent = get_value(elite_percent_var, 10.0)/100
     elite_count = elite_count_var.get() if elite_count_var.get() else None
@@ -352,7 +352,7 @@ mutation_method_combobox.grid(row=1, column=1)
 mutation_method_combobox.state(["readonly"]) 
 
 tk.Label(select_frame, text="Function to calculation", anchor="w", width=25).grid(row=2, column=0)
-function_combobox = ttk.Combobox(select_frame, textvariable=function_var, values=["Hypersphere", "Rotated High Conditioned Elliptic Function"], width=15)
+function_combobox = ttk.Combobox(select_frame, textvariable=function_var, values=["Hypersphere", "Shifted and Rotated HappyCat Function"], width=15)
 function_combobox.grid(row=2, column=1)
 function_combobox.state(["readonly"])
 

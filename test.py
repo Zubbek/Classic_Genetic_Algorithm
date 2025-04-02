@@ -5,17 +5,17 @@ import time
 import csv
 
 import benchmark_functions as bf
-from opfunu.cec_based.cec2014 import F12014
+from opfunu.cec_based.cec2014 import F132014
 from Population import Population
 
-function_version = "Hypersphere_minimal"
+function_version = "Shifted_and_Rotated_HappyCat_Function_minimal"
 
 # Funkcja zwracająca wybraną funkcję testową na podstawie nazwy
 def get_function(name, ndim):
     if name == "Hypersphere":
         return bf.Hypersphere(n_dimensions=ndim)
-    elif name == "Rotated High Conditioned Elliptic Function":
-        func = F12014(ndim=ndim)
+    elif name == "Shifted and Rotated HappyCat Function":
+        func = F132014(ndim=ndim)
         return func.evaluate
 
 # Funkcja zapisująca dane eksperymentalne do pliku CSV (dodaje wiersz)
@@ -27,22 +27,22 @@ def append_results_csv(filename, row):
 # Funkcja wykonująca pojedynczy eksperyment
 def run_experiment(selection_method, cross_method, mutation_method, run_number):
     # Parametry domyślne
-    start_ = -5.0
-    end_ = 5.0
+    start_ = -50
+    end_ = 50
     precision = 4
     population_size = 50
     epochs = 500
     variables_count = 10
-    elite_percent = 10.0 / 100
+    elite_percent = 10.0/100
     elite_count = None
     cross_prob = 0.8
     mutation_prob = 0.05
     inversion_prob = 0.01
     best_select_percent = 20.0
     tournament_size = 3  # Używane, gdy selection_method == "Tournament"
-    cross_probability = 0.7  # używane dla "Uniform crossover"
-    function_name = "Hypersphere"  # domyślna funkcja
-    is_maximization = False  # optymalizacja: minimizacja
+    cross_probability = 0.8  # używane dla "Uniform crossover"
+    function_name = "Shifted and Rotated HappyCat Function"  # domyślna funkcja
+    is_maximization = True  # optymalizacja: minimizacja
 
     # Mapa metod krzyżowania
     crossover_mapping = {
@@ -183,13 +183,13 @@ def main():
                     row = [sel, cross, mut, i, elapsed_time, best_fit, chart1, chart2]
                     append_results_csv(results_csv, row)
                 # Obliczenie średnich dla 10 powtórzeń
-                avg_time = sum(run_times) / len(run_times)
-                avg_fitness = sum(run_fitnesses) / len(run_fitnesses)
-                best_run_time = min(run_times)
-                worst_run_time = max(run_times)
+                avg_time = round(sum(run_times) / len(run_times),4)
+                avg_fitness = round(sum(run_fitnesses) / len(run_fitnesses),4)
+                best_run_time = round(min(run_times),4)
+                worst_run_time = round(max(run_times),4)
                 # Przyjmując, że optymalizujemy przez minimalizację, najlepszy fitness = minimalny
-                best_run_fitness = min(run_fitnesses)
-                worst_run_fitness = max(run_fitnesses)
+                best_run_fitness = round(min(run_fitnesses),4)
+                worst_run_fitness = round(max(run_fitnesses),4)
                 # Zapis podsumowania do osobnego pliku CSV
                 append_results_csv(summery_csv, [sel, cross, mut, avg_time, avg_fitness,
                                                  best_run_fitness, worst_run_fitness,

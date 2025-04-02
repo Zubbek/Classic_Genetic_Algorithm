@@ -1,0 +1,37 @@
+    Selection Method,Cross Method,Mutation Method,�redni czas,�redni Fitness,Najlepszy Fitness,Najgorszy Fitness,Najlepszy czas,Najgorszy czas
+    Roulette Wheel,One-Point,Boundary,2.6755,249.9927,249.9878,250.0,2.349,3.6227
+    Roulette Wheel,One-Point,One-Point,3.3531,249.9957,249.9878,250.0,2.5824,4.1684
+    Roulette Wheel,One-Point,Two-Point,3.897,249.9872,249.9512,250.0,2.8249,5.2224
+    Roulette Wheel,Two-Point,Boundary,5.0476,249.9945,249.9756,250.0,3.8867,7.0265
+    Roulette Wheel,Two-Point,One-Point,5.8745,249.9963,249.9878,250.0,4.3506,12.4403
+    Roulette Wheel,Two-Point,Two-Point,5.5104,249.9951,249.9756,250.0,3.8408,7.4499
+    Roulette Wheel,Uniform crossover,Boundary,4.7475,249.9902,249.9634,250.0,3.7975,6.9417
+    Roulette Wheel,Uniform crossover,One-Point,3.5741,249.9939,249.9817,250.0,3.1242,4.2255
+    Roulette Wheel,Uniform crossover,Two-Point,3.5183,249.9927,249.9695,250.0,3.1407,4.0098
+    Roulette Wheel,Granular crossover,Boundary,3.381,249.964,249.7683,250.0,3.0659,3.8401
+    Roulette Wheel,Granular crossover,One-Point,3.2064,249.9921,249.9756,250.0,2.872,3.7407
+    Roulette Wheel,Granular crossover,Two-Point,3.2725,249.9829,249.9451,250.0,2.9419,3.6902
+    Best solution,One-Point,Boundary,3.2026,249.7488,249.2876,249.9268,2.8943,3.5812
+    Best solution,One-Point,One-Point,3.4663,249.6812,249.4766,249.8719,3.1479,3.7965
+    Best solution,One-Point,Two-Point,3.9615,249.5443,248.4591,249.8657,3.2593,4.7395
+    Best solution,Two-Point,Boundary,3.1357,249.8165,249.5986,249.9268,2.8989,3.4936
+    Best solution,Two-Point,One-Point,3.6466,249.7817,249.5857,249.8597,3.269,4.0782
+    Best solution,Two-Point,Two-Point,4.9902,249.7958,249.5681,249.9756,3.6015,6.1337
+    Best solution,Uniform crossover,Boundary,5.0762,249.8671,249.555,249.9817,3.5156,8.638
+    Best solution,Uniform crossover,One-Point,3.8426,249.7707,249.4515,249.9695,3.3126,5.1236
+    Best solution,Uniform crossover,Two-Point,3.2589,249.7818,249.4278,249.939,3.0467,3.4536
+    Best solution,Granular crossover,Boundary,3.1515,249.858,249.4218,249.9695,2.9438,3.3931
+    Best solution,Granular crossover,One-Point,3.1973,249.6228,249.1698,249.9329,2.8557,3.4867
+    Best solution,Granular crossover,Two-Point,3.3487,249.7353,249.1027,249.9268,3.0861,3.6223
+    Tournament,One-Point,Boundary,3.6878,249.4943,248.6556,249.8657,3.1947,7.0085
+    Tournament,One-Point,One-Point,4.4725,249.4597,248.9114,249.8109,3.2505,7.5456
+    Tournament,One-Point,Two-Point,3.8676,249.3425,248.6789,249.7255,3.1673,4.2611
+    Tournament,Two-Point,Boundary,3.622,249.487,248.6647,249.9329,2.6116,4.8175
+    Tournament,Two-Point,One-Point,3.5625,249.4765,248.7007,249.8414,3.2519,3.812
+    Tournament,Two-Point,Two-Point,3.5895,249.5163,248.7677,249.8658,3.2723,4.123
+    Tournament,Uniform crossover,Boundary,3.962,249.7795,249.2089,249.939,3.4554,5.7174
+    Tournament,Uniform crossover,One-Point,4.2915,249.4751,248.5613,249.9451,3.3353,5.8563
+    Tournament,Uniform crossover,Two-Point,3.715,249.6457,249.0844,249.9024,3.2993,5.1525
+    Tournament,Granular crossover,Boundary,3.6738,249.7281,249.4638,249.8963,3.0254,4.978
+    Tournament,Granular crossover,One-Point,4.2596,249.667,249.4574,249.8719,3.1973,5.7794
+    Tournament,Granular crossover,Two-Point,3.6042,249.4417,248.7013,249.8658,3.253,4.1657

@@ -1,0 +1,37 @@
+Selection Method,Cross Method,Mutation Method,Œredni czas,Œredni Fitness,Najlepszy Fitness,Najgorszy Fitness,Najlepszy czas,Najgorszy czas
+Roulette Wheel,One-Point,Boundary,5.0493,1301.7959,1301.7586,1301.9291,4.8123,5.5757
+Roulette Wheel,One-Point,One-Point,5.9589,1301.7781,1301.7601,1301.902,4.9333,8.1777
+Roulette Wheel,One-Point,Two-Point,5.0446,1301.785,1301.7594,1301.9148,4.8777,5.2896
+Roulette Wheel,Two-Point,Boundary,5.0558,1301.7674,1301.7589,1301.7927,5.0219,5.1064
+Roulette Wheel,Two-Point,One-Point,5.0662,1301.7666,1301.7585,1301.7812,5.0272,5.1348
+Roulette Wheel,Two-Point,Two-Point,5.0957,1301.8122,1301.7639,1301.9531,5.0169,5.1703
+Roulette Wheel,Uniform crossover,Boundary,5.3743,1301.8628,1301.7728,1302.1392,5.2028,5.5564
+Roulette Wheel,Uniform crossover,One-Point,5.8216,1301.7688,1301.7584,1301.788,5.3101,6.9685
+Roulette Wheel,Uniform crossover,Two-Point,5.4924,1301.7864,1301.7584,1301.9537,5.2997,5.6807
+Roulette Wheel,Granular crossover,Boundary,5.5087,1302.5013,1301.9124,1303.9844,5.226,6.9401
+Roulette Wheel,Granular crossover,One-Point,5.3319,1301.7812,1301.7593,1301.8987,5.2536,5.4286
+Roulette Wheel,Granular crossover,Two-Point,5.2666,1301.8042,1301.7592,1301.8958,5.1693,5.3944
+Best solution,One-Point,Boundary,4.9177,1301.7611,1301.7583,1301.772,4.8167,5.0639
+Best solution,One-Point,One-Point,5.0587,1301.7769,1301.7584,1301.8934,4.9343,5.4264
+Best solution,One-Point,Two-Point,4.9834,1301.764,1301.7587,1301.7789,4.8835,5.1943
+Best solution,Two-Point,Boundary,5.6341,1301.7787,1301.7583,1301.8977,5.0625,7.9235
+Best solution,Two-Point,One-Point,5.206,1301.7789,1301.7583,1301.9095,5.1226,5.3772
+Best solution,Two-Point,Two-Point,5.2584,1301.7955,1301.7583,1301.9536,5.0041,5.9267
+Best solution,Uniform crossover,Boundary,5.3255,1301.7629,1301.7583,1301.7861,5.1701,5.5436
+Best solution,Uniform crossover,One-Point,5.2743,1301.7632,1301.7583,1301.7789,5.1876,5.3681
+Best solution,Uniform crossover,Two-Point,5.2986,1301.7635,1301.7583,1301.7762,5.2069,5.4632
+Best solution,Granular crossover,Boundary,5.3256,1301.7673,1301.7588,1301.7877,5.1021,5.8877
+Best solution,Granular crossover,One-Point,5.3264,1301.7613,1301.7584,1301.7651,5.2442,5.4119
+Best solution,Granular crossover,Two-Point,5.2977,1301.7653,1301.7585,1301.7791,5.2118,5.5775
+Tournament,One-Point,Boundary,5.2352,1301.7634,1301.7584,1301.7761,5.1508,5.3024
+Tournament,One-Point,One-Point,5.2147,1301.7622,1301.7584,1301.7699,5.1523,5.2672
+Tournament,One-Point,Two-Point,5.2645,1301.7635,1301.7583,1301.7799,5.1566,5.5139
+Tournament,Two-Point,Boundary,5.309,1301.7931,1301.7584,1301.8974,5.2663,5.4041
+Tournament,Two-Point,One-Point,5.3379,1301.7765,1301.7583,1301.9067,5.2268,5.597
+Tournament,Two-Point,Two-Point,5.2967,1301.7651,1301.7583,1301.7789,5.1809,5.6238
+Tournament,Uniform crossover,Boundary,5.5658,1301.7634,1301.7583,1301.7826,5.5123,5.6514
+Tournament,Uniform crossover,One-Point,5.611,1301.7755,1301.7583,1301.8968,5.5358,5.709
+Tournament,Uniform crossover,Two-Point,5.5519,1301.7687,1301.7583,1301.7791,5.4771,5.6348
+Tournament,Granular crossover,Boundary,5.5568,1301.7694,1301.7584,1301.8274,5.4042,5.9423
+Tournament,Granular crossover,One-Point,5.5927,1301.7753,1301.7583,1301.8756,5.5004,5.8384
+Tournament,Granular crossover,Two-Point,5.573,1301.7607,1301.7583,1301.7766,5.513,5.6821
