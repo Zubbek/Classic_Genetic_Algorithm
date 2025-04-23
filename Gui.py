@@ -215,7 +215,8 @@ def start_algorithm():
 
 
         # Inwersja
-        # population.inversion(inversion_prob)
+        if representation_type == "binary":
+            population.inversion(inversion_prob)
 
         fitness_values = [float(population.fitness(individual)) for individual in population.individuals]
         if is_maximization:
