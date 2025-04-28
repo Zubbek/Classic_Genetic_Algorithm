@@ -2,3 +2,5 @@ __pycache__/
 OE
 wyniki.csv
 *.png
+
+venv
