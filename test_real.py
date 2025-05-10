@@ -27,8 +27,8 @@ def append_results_csv(filename, row):
 # Funkcja wykonująca pojedynczy eksperyment dla reprezentacji rzeczywistej
 def run_experiment_real(selection_method, cross_method, mutation_method, run_number):
     # Parametry domyślne
-    start_ = -50.0
-    end_ = 50.0
+    start_ = -5.0
+    end_ = 5.0
     precision = 4
     population_size = 50
     epochs = 500
