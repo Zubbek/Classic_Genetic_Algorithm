@@ -8,7 +8,7 @@ import benchmark_functions as bf
 from opfunu.cec_based.cec2014 import F132014
 from Population import Population
 
-function_version = "Shifted_and_Rotated_HappyCat_Function_minimal"
+function_version = "Shifted_and_Rotated_HappyCat_Function_real"
 
 # Funkcja zwracająca wybraną funkcję testową na podstawie nazwy
 def get_function(name, ndim):
@@ -24,11 +24,11 @@ def append_results_csv(filename, row):
         writer = csv.writer(file)
         writer.writerow(row)
 
-# Funkcja wykonująca pojedynczy eksperyment
-def run_experiment(selection_method, cross_method, mutation_method, run_number):
+# Funkcja wykonująca pojedynczy eksperyment dla reprezentacji rzeczywistej
+def run_experiment_real(selection_method, cross_method, mutation_method, run_number):
     # Parametry domyślne
-    start_ = -50
-    end_ = 50
+    start_ = -50.0
+    end_ = 50.0
     precision = 4
     population_size = 50
     epochs = 500
@@ -37,27 +37,31 @@ def run_experiment(selection_method, cross_method, mutation_method, run_number):
     elite_count = None
     cross_prob = 0.8
     mutation_prob = 0.05
-    inversion_prob = 0.01
+    inversion_prob = 0.01 # Inwersja nie jest typowa dla reprezentacji rzeczywistej, ale zostawiam na razie
     best_select_percent = 20.0
     tournament_size = 3  # Używane, gdy selection_method == "Tournament"
-    cross_probability = 0.8  # używane dla "Uniform crossover"
+    cross_probability = 0.8 # używane dla "Uniform crossover" dla real
+    alpha = 0.1
+    beta = 0.9
     function_name = "Shifted and Rotated HappyCat Function"  # domyślna funkcja
-    is_maximization = True  # optymalizacja: minimizacja
+    is_maximization = True  # optymalizacja: minimalizacja
+    representation_type = "real"
 
-    # Mapa metod krzyżowania
+    # Mapa metod krzyżowania dla liczb rzeczywistych
     crossover_mapping = {
-        "One-Point": 1,
-        "Two-Point": 2,
-        "Uniform crossover": 3,
-        "Granular crossover": 4
+        "arithmetic_crossover_real": 5,
+        "linear_crossover_real": 6,
+        "blend_crossover_alpha_real": 7,
+        "blend_crossover_alpha_beta_real": 8,
+        "average_crossover_real": 9,
     }
-    crossover_method_number = crossover_mapping.get(cross_method, 1)
+    crossover_method_number = crossover_mapping.get(cross_method, 5)
 
     # Przygotowanie funkcji celu
     func = get_function(function_name, variables_count)
 
     # Inicjalizacja populacji
-    population = Population(variables_count, population_size, precision, start_, end_, func, "max" if is_maximization else "min")
+    population = Population(variables_count, population_size, precision, start_, end_, func, "max" if is_maximization else "min", std_dev=0.1, alpha=alpha, beta=beta, representation_type=representation_type)
 
     best_fitness_values = []
     avg_fitness_values = []
@@ -80,16 +84,16 @@ def run_experiment(selection_method, cross_method, mutation_method, run_number):
 
         # Krzyżowanie
         population.population_after_crossover(
-            crossover_method_number=crossover_method_number, 
-            crossover_rate=cross_prob, 
+            crossover_method_number=crossover_method_number,
+            crossover_rate=cross_prob,
             elite=len(elite_individuals),
-            cross_probability=cross_probability if cross_method == "Uniform crossover" else None
+            cross_probability=cross_probability if cross_method == "Uniform crossover" else None # Uniform crossover nie jest typowy dla real, ale zostawiam
         )
 
         # Mutacja
         population.population_after_mutationr(mutation_method, mutation_prob)
 
-        # Inwersja
+        # Inwersja (może nie mieć sensu dla real, ale zostawiam)
         population.inversion(inversion_prob)
 
         # Obliczenie statystyk
@@ -146,14 +150,14 @@ def run_experiment(selection_method, cross_method, mutation_method, run_number):
 
     return elapsed_time, best_fitness_values[-1], file_chart1, file_chart2
 
-def main():
-    # Kombinacje metod
+def main_real():
+    # Kombinacje metod dla liczb rzeczywistych
     selection_methods = ["Roulette Wheel", "Best solution", "Tournament"]
-    cross_methods = ["One-Point", "Two-Point", "Uniform crossover", "Granular crossover"]
-    mutation_methods = ["Boundary", "One-Point", "Two-Point"]
+    cross_methods = ["arithmetic_crossover_real", "linear_crossover_real", "blend_crossover_alpha_real", "blend_crossover_alpha_beta_real", "average_crossover_real"]
+    mutation_methods = ["Gaussian", "Uniform"]
 
-    results_csv = "test_results.csv"
-    summery_csv = "test_summery.csv"
+    results_csv = "test_results_real.csv"
+    summery_csv = "test_summery_real.csv"
 
     # Zapis nagłówka do pliku z wynikami eksperymentów
     with open(results_csv, mode='w', newline='') as file:
@@ -163,10 +167,10 @@ def main():
     # Zapis nagłówka do pliku z podsumowaniami (rozszerzony)
     with open(summery_csv, mode='w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(["Selection Method", "Cross Method", "Mutation Method", 
-                         "Średni czas", "Średni Fitness", 
-                         "Najlepszy Fitness", "Najgorszy Fitness", 
-                         "Najlepszy czas", "Najgorszy czas"])
+        writer.writerow(["Selection Method", "Cross Method", "Mutation Method",
+                            "Średni czas", "Średni Fitness",
+                            "Najlepszy Fitness", "Najgorszy Fitness",
+                            "Najlepszy czas", "Najgorszy czas"])
 
     # Iteracja przez wszystkie kombinacje
     for sel in selection_methods:
@@ -175,8 +179,8 @@ def main():
                 run_times = []
                 run_fitnesses = []
                 for i in range(1, 11):
-                    print(f"Uruchomienie: {sel} | {cross} | {mut} | Run {i}")
-                    elapsed_time, best_fit, chart1, chart2 = run_experiment(sel, cross, mut, i)
+                    print(f"Uruchomienie REAL: {sel} | {cross} | {mut} | Run {i}")
+                    elapsed_time, best_fit, chart1, chart2 = run_experiment_real(sel, cross, mut, i)
                     run_times.append(elapsed_time)
                     run_fitnesses.append(best_fit)
                     # Zapis pojedynczego wyniku do pliku wynikowego
@@ -192,9 +196,9 @@ def main():
                 worst_run_fitness = round(max(run_fitnesses),4)
                 # Zapis podsumowania do osobnego pliku CSV
                 append_results_csv(summery_csv, [sel, cross, mut, avg_time, avg_fitness,
-                                                 best_run_fitness, worst_run_fitness,
-                                                 best_run_time, worst_run_time])
-    print("Wszystkie wyniki zapisano do plików test_results.csv oraz test_summery.csv")
+                                                    best_run_fitness, worst_run_fitness,
+                                                    best_run_time, worst_run_time])
+    print("Wszystkie wyniki dla reprezentacji rzeczywistej zapisano do plików test_results_real.csv oraz test_summery_real.csv")
 
 if __name__ == "__main__":
-    main()
+    main_real()

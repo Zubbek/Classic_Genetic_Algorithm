@@ -5,7 +5,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 import time
 import benchmark_functions as bf
-# from opfunu.cec_based.cec2014 import F132014
+from opfunu.cec_based.cec2014 import F132014
 from Population import Population
 import csv
 
@@ -14,10 +14,8 @@ def get_function(name, ndim):
     if name == "Hypersphere":
         return bf.Hypersphere(n_dimensions=ndim)
     elif name == "Shifted and Rotated HappyCat Function":
-        return bf.Hypersphere(n_dimensions=ndim)
-
-        # func = F132014(ndim=ndim)
-        # return func.evaluate
+        func = F132014(ndim=ndim)
+        return func.evaluate
 
 def save_results_csv(filename, best_fitness_values, avg_fitness_values, std_fitness_values):
     """Zapisuje wyniki algorytmu do pliku CSV."""
