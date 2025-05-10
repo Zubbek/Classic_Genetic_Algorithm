@@ -8,7 +8,7 @@ import benchmark_functions as bf
 from opfunu.cec_based.cec2014 import F132014
 from Population import Population
 
-function_version = "Shifted_and_Rotated_HappyCat_Function_real"
+function_version = "Hypersphere_real"
 
 # Funkcja zwracająca wybraną funkcję testową na podstawie nazwy
 def get_function(name, ndim):
@@ -43,8 +43,8 @@ def run_experiment_real(selection_method, cross_method, mutation_method, run_num
     cross_probability = 0.8 # używane dla "Uniform crossover" dla real
     alpha = 0.1
     beta = 0.9
-    function_name = "Shifted and Rotated HappyCat Function"  # domyślna funkcja
-    is_maximization = True  # optymalizacja: minimalizacja
+    function_name = "Hypersphere"  # domyślna funkcja
+    is_maximization = False  # optymalizacja: minimalizacja
     representation_type = "real"
 
     # Mapa metod krzyżowania dla liczb rzeczywistych
@@ -94,7 +94,7 @@ def run_experiment_real(selection_method, cross_method, mutation_method, run_num
         population.population_after_mutationr(mutation_method, mutation_prob)
 
         # Inwersja (może nie mieć sensu dla real, ale zostawiam)
-        population.inversion(inversion_prob)
+        # population.inversion(inversion_prob)
 
         # Obliczenie statystyk
         fitness_values = [float(population.fitness(individual)) for individual in population.individuals]
