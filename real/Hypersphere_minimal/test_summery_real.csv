@@ -1,0 +1,31 @@
+Selection Method,Cross Method,Mutation Method,Œredni czas,Œredni Fitness,Najlepszy Fitness,Najgorszy Fitness,Najlepszy czas,Najgorszy czas
+Roulette Wheel,arithmetic_crossover_real,Gaussian,0.3399,493.4254,192.0145,764.349,0.3311,0.3557
+Roulette Wheel,arithmetic_crossover_real,Uniform,0.2596,13.8293,5.8489,21.2488,0.2474,0.2743
+Roulette Wheel,linear_crossover_real,Gaussian,0.475,43.9162,0.0122,254.0829,0.4164,0.5304
+Roulette Wheel,linear_crossover_real,Uniform,0.4391,7.9886,1.5345,16.9435,0.4114,0.4899
+Roulette Wheel,blend_crossover_alpha_real,Gaussian,0.4463,0.0018,0.0002,0.0091,0.4194,0.5016
+Roulette Wheel,blend_crossover_alpha_real,Uniform,0.4087,2.6055,0.4967,10.7749,0.3508,0.541
+Roulette Wheel,blend_crossover_alpha_beta_real,Gaussian,0.5039,0.0003,0.0,0.0011,0.419,0.6412
+Roulette Wheel,blend_crossover_alpha_beta_real,Uniform,0.4108,0.7182,0.0055,2.5469,0.3879,0.4392
+Roulette Wheel,average_crossover_real,Gaussian,0.4033,786.3328,258.9032,1357.8242,0.361,0.4716
+Roulette Wheel,average_crossover_real,Uniform,0.284,13.9428,5.7721,28.3354,0.2609,0.3004
+Best solution,arithmetic_crossover_real,Gaussian,0.3942,96.6394,0.0177,340.407,0.3744,0.4207
+Best solution,arithmetic_crossover_real,Uniform,0.2883,8.0085,2.9446,14.9956,0.263,0.3152
+Best solution,linear_crossover_real,Gaussian,0.4688,3.7011,0.0077,36.4353,0.4329,0.5001
+Best solution,linear_crossover_real,Uniform,0.4134,8.5287,0.4966,32.0293,0.3993,0.4316
+Best solution,blend_crossover_alpha_real,Gaussian,0.4447,0.0053,0.0002,0.0115,0.4061,0.4931
+Best solution,blend_crossover_alpha_real,Uniform,0.3917,4.2204,0.1565,16.8197,0.3594,0.432
+Best solution,blend_crossover_alpha_beta_real,Gaussian,0.4908,0.0067,0.0001,0.0277,0.4351,0.6245
+Best solution,blend_crossover_alpha_beta_real,Uniform,0.4098,4.2043,0.4618,15.0522,0.3832,0.4276
+Best solution,average_crossover_real,Gaussian,0.4017,63.7615,0.0311,359.8101,0.3689,0.4672
+Best solution,average_crossover_real,Uniform,0.3007,11.9933,1.1541,24.6078,0.265,0.3702
+Tournament,arithmetic_crossover_real,Gaussian,0.4512,590.3629,181.0799,1450.4116,0.3948,0.5167
+Tournament,arithmetic_crossover_real,Uniform,0.2951,15.0298,5.2597,23.2158,0.2674,0.319
+Tournament,linear_crossover_real,Gaussian,0.5366,229.9578,0.062,1018.7236,0.4947,0.5943
+Tournament,linear_crossover_real,Uniform,0.4482,8.843,2.4082,20.8105,0.4122,0.4996
+Tournament,blend_crossover_alpha_real,Gaussian,0.5014,8.7952,0.008,78.3851,0.4581,0.6166
+Tournament,blend_crossover_alpha_real,Uniform,0.4376,7.5689,0.1246,27.8737,0.3954,0.4816
+Tournament,blend_crossover_alpha_beta_real,Gaussian,0.5767,18.5684,0.0058,161.0312,0.5128,0.6375
+Tournament,blend_crossover_alpha_beta_real,Uniform,0.4431,5.0954,0.4578,13.4774,0.3918,0.4919
+Tournament,average_crossover_real,Gaussian,0.4138,474.227,49.6744,940.0204,0.3898,0.457
+Tournament,average_crossover_real,Uniform,0.3101,12.3917,2.9183,29.7802,0.2784,0.3544

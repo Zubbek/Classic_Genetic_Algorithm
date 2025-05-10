@@ -348,11 +348,15 @@ class Population:
             for idx in indexes:
                 c[idx] = 0 if c[idx] == 1 else 1
 
-    def mutate_uniform(self, individual):
-        """Mutacja równomierna - losowo zmienia każdy bit z określonym prawdopodobieństwem."""
-        for c in individual.chromosom.chromosoms:
-            for i in range(len(c)):
-                    c[i] = 0 if c[i] == 1 else 1
+    def mutate_uniform(self, individual, mutation_rate=0.1):
+        """Mutacja równomierna dla reprezentacji rzeczywistej — z określonym prawdopodobieństwem przypisuje nową wartość z zakresu."""
+        if self.representation_type == "real":
+            for i in range(len(individual.chromosom.real_values)):
+                if np.random.rand() < mutation_rate:
+                    individual.chromosom.real_values[i] = np.random.uniform(
+                        self.start_[i] if isinstance(self.start_, list) else self.start_,
+                        self.end_[i] if isinstance(self.end_, list) else self.end_
+                    )
 
     def mutate_gaussian(self, individual, std_dev=0.1):
         """Mutacja Gaussa - dodaje losową wartość z rozkładu normalnego do wartości rzeczywistych."""
@@ -364,13 +368,6 @@ class Population:
                     self.start_[i] if isinstance(self.start_, list) else self.start_,
                     self.end_[i] if isinstance(self.end_, list) else self.end_
                 )
-        elif self.representation_type == "binary":
-            # Mutacja Gaussa nie jest typowa dla reprezentacji binarnej.
-            # Można rozważyć konwersję na wartości rzeczywiste, mutację i ponowną konwersję,
-            # ale to wykracza poza prostą implementację.
-            print("Ostrzeżenie: Mutacja Gaussa nie jest bezpośrednio stosowana do reprezentacji binarnej.")
-            
-
 
     def population_after_mutationr(self, mutation_method, mutation_rate=1.0):
         for i in range(0, len(self.best_individuals)):
