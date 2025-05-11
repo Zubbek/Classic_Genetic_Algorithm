@@ -111,6 +111,10 @@ binary_mutation_methods = {
 
 real_mutation_methods = {
     "random": "random",
+    "swap": swap_mutation,
+    "boundary": boundary_mutation,
+    "one_point": one_point_mutation,
+    "two_point": two_point_mutation,
     "gaussian": gaussian_mutation
 }
 
@@ -174,32 +178,32 @@ for selection_method in selection_methods:
     plt.tight_layout()
     plt.show()
 
-# ===== WYKRES SŁUPKOWY — ŚREDNIA WARTOŚĆ FITNESS =====
-mean_scores = {
-    k: (1.0 / (v["fitness_mean"] + 1e-8) if is_minimum else v["fitness_mean"])
-    for k, v in experiment_results.items()
-}
+    # ===== WYKRES SŁUPKOWY — ŚREDNIA WARTOŚĆ FITNESS =====
+    mean_scores = {
+        k: (1.0 / (v["fitness_mean"] + 1e-8) if is_minimum else v["fitness_mean"])
+        for k, v in experiment_results.items()
+    }
 
-plt.figure(figsize=(14, 6))
-plt.bar(mean_scores.keys(), mean_scores.values(), color='skyblue')
-plt.xticks(rotation=90, fontsize=8)
-plt.ylabel("Średnia wartość funkcji celu")
-plt.title("📊 Średnia wartość funkcji celu dla każdej konfiguracji")
-plt.tight_layout()
-plt.grid(axis='y', linestyle='--', alpha=0.6)
-plt.show()
+    plt.figure(figsize=(14, 6))
+    plt.bar(mean_scores.keys(), mean_scores.values(), color='skyblue')
+    plt.xticks(rotation=90, fontsize=8)
+    plt.ylabel("Średnia wartość funkcji celu")
+    plt.title("📊 Średnia wartość funkcji celu dla każdej konfiguracji")
+    plt.tight_layout()
+    plt.grid(axis='y', linestyle='--', alpha=0.6)
+    plt.show()
 
-# ===== WYKRES SŁUPKOWY — ODCHYLENIE STANDARDOWE =====
-std_scores = {k: v["fitness_std"] for k, v in experiment_results.items()}
+    # ===== WYKRES SŁUPKOWY — ODCHYLENIE STANDARDOWE =====
+    std_scores = {k: v["fitness_std"] for k, v in experiment_results.items()}
 
-plt.figure(figsize=(14, 6))
-plt.bar(std_scores.keys(), std_scores.values(), color='salmon')
-plt.xticks(rotation=90, fontsize=8)
-plt.ylabel("Odchylenie standardowe wartości funkcji celu")
-plt.title("📊 Odchylenie standardowe dla każdej konfiguracji")
-plt.tight_layout()
-plt.grid(axis='y', linestyle='--', alpha=0.6)
-plt.show()
+    plt.figure(figsize=(14, 6))
+    plt.bar(std_scores.keys(), std_scores.values(), color='salmon')
+    plt.xticks(rotation=90, fontsize=8)
+    plt.ylabel("Odchylenie standardowe wartości funkcji celu")
+    plt.title("📊 Odchylenie standardowe dla każdej konfiguracji")
+    plt.tight_layout()
+    plt.grid(axis='y', linestyle='--', alpha=0.6)
+    plt.show()
 
 
 
