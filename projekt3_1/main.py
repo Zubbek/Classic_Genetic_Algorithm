@@ -7,10 +7,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from crossovers import my_single_point_crossover, my_uniform_crossover, my_discrete_crossover, \
-    my_two_point_crossover
+    my_two_point_crossover, arithmetic_crossover_real, linear_crossover_real, blend_crossover_alpha_real, \
+    blend_crossover_alpha_beta_real, average_crossover_real
 from mutations import swap_mutation, boundary_mutation, one_point_mutation, two_point_mutation
 # ===== KONFIGURACJA UŻYTKOWNIKA =====
-use_binary = True  # <-- Zmienna sterująca: True = binarny, False = rzeczywisty
+use_binary = False  # <--True = binarny, False = rzeczywisty
 
 # ===== Funkcja dekodująca osobnika binarnego =====
 def decodeInd(individual, bits_per_var=20, var_count=5, x_min=-32.768, x_max=32.768):
@@ -56,7 +57,7 @@ bits_per_var = 20
 num_genes = num_vars * bits_per_var if use_binary else num_vars
 func = get_function("Hypersphere", num_vars)
 num_generations = 50
-is_minimum = False
+is_minimum = True
 
 # ===== Parametry GA (stałe) =====
 common_args = dict(
@@ -64,16 +65,17 @@ common_args = dict(
     num_parents_mating=50,
     num_genes=num_genes,
     mutation_num_genes=1,
-    keep_elitism=3, #domyslnie bylo 1
-    init_range_low=0,
-    init_range_high=1,
-    random_mutation_max_val=1,
-    random_mutation_min_val=0
+    gene_type = int if use_binary else float,
+    init_range_low=0 if use_binary else -32.768,
+    init_range_high=2 if use_binary else 32.768,
+    keep_elitism=1,
+    random_mutation_max_val=32.768,
+    random_mutation_min_val=-32.768,
 )
 
 # ===== Eksperyment główny =====
 selection_methods = ["tournament", "rws", "random"]
-crossover_methods = {
+binary_crossover_methods = {
     "single_point": "single_point",
     "two_points": "two_points",
     "uniform": "uniform",
@@ -81,6 +83,13 @@ crossover_methods = {
     "my_two_point": my_two_point_crossover,
     "my_uniform": my_uniform_crossover,
     "my_discrete": my_discrete_crossover
+}
+real_crossover_methods = {
+    "arithmetic": arithmetic_crossover_real,
+    "linear": linear_crossover_real,
+    "blend_alpha": blend_crossover_alpha_real,
+    "blend_alpha_beta": blend_crossover_alpha_beta_real,
+    "average": average_crossover_real
 }
 mutation_methods = {
     "random": "random",
@@ -96,6 +105,7 @@ def fitness_func(ga_instance, solution, solution_idx):
     return fitnessFunction(solution, num_vars, bits_per_var, is_minimum)
 
 for selection_method in selection_methods:
+    crossover_methods = binary_crossover_methods.copy() if use_binary else real_crossover_methods.copy()
     for crossover_name, crossover_strategy in crossover_methods.items():
         for mutation_name, mutation_strategy in mutation_methods.items():
             print(f"🔍 {selection_method} | {crossover_name} | {mutation_name}")
