@@ -33,3 +33,9 @@ def two_point_mutation(offspring, ga_instance):
         offspring[i][idx2] = 1 - int(round(offspring[i][idx2]))
     return offspring
 
+
+def gaussian_mutation(offspring, ga_instance):
+    for i in range(offspring.shape[0]):
+        gene_idx = np.random.randint(offspring.shape[1])
+        offspring[i, gene_idx] += np.random.normal(loc=0.0, scale=1.0)
+    return offspring

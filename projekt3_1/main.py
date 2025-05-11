@@ -5,13 +5,27 @@ import benchmark_functions as bf
 from opfunu.cec_based import F132014
 import matplotlib.pyplot as plt
 import pandas as pd
+import argparse
 
 from crossovers import my_single_point_crossover, my_uniform_crossover, my_discrete_crossover, \
     my_two_point_crossover, arithmetic_crossover_real, linear_crossover_real, blend_crossover_alpha_real, \
     blend_crossover_alpha_beta_real, average_crossover_real
-from mutations import swap_mutation, boundary_mutation, one_point_mutation, two_point_mutation
+from mutations import swap_mutation, boundary_mutation, one_point_mutation, two_point_mutation, gaussian_mutation
+
 # ===== KONFIGURACJA UŻYTKOWNIKA =====
-use_binary = False  # <--True = binarny, False = rzeczywisty
+parser = argparse.ArgumentParser(description="Algorytm genetyczny z możliwością konfiguracji.")
+parser.add_argument("--num_vars", type=int, default=5, help="Liczba zmiennych (domyślnie 5)")
+parser.add_argument("--bits_per_var", type=int, default=20, help="Liczba bitów na zmienną (domyślnie 20)")
+parser.add_argument("--num_generations", type=int, default=50, help="Liczba generacji (domyślnie 50")
+parser.add_argument("--use_binary", type=int, choices=[0, 1], default=0, help="Reprezentacja binarna (1) lub rzeczywista (0)")
+parser.add_argument("--is_minimum", type=int, choices=[0, 1], default=0, help="Minimalizacja (1) lub maksymalizacja (0)")
+
+args = parser.parse_args()
+use_binary = bool(args.use_binary)
+is_minimum = bool(args.is_minimum)
+num_vars = args.num_vars
+bits_per_var = args.bits_per_var
+num_generations = args.num_generations
 
 # ===== Funkcja dekodująca osobnika binarnego =====
 def decodeInd(individual, bits_per_var=20, var_count=5, x_min=-32.768, x_max=32.768):
@@ -52,12 +66,8 @@ def fitnessFunction(individual, num_vars, bits_per_var, is_minimum=False):
 
 
 # ===== Parametry ogólne =====
-num_vars = 5
-bits_per_var = 20
 num_genes = num_vars * bits_per_var if use_binary else num_vars
 func = get_function("Hypersphere", num_vars)
-num_generations = 50
-is_minimum = True
 
 # ===== Parametry GA (stałe) =====
 common_args = dict(
@@ -65,7 +75,7 @@ common_args = dict(
     num_parents_mating=50,
     num_genes=num_genes,
     mutation_num_genes=1,
-    gene_type = int if use_binary else float,
+    gene_type=int if use_binary else float,
     init_range_low=0 if use_binary else -32.768,
     init_range_high=2 if use_binary else 32.768,
     keep_elitism=1,
@@ -91,13 +101,19 @@ real_crossover_methods = {
     "blend_alpha_beta": blend_crossover_alpha_beta_real,
     "average": average_crossover_real
 }
-mutation_methods = {
+binary_mutation_methods = {
     "random": "random",
     "swap": swap_mutation,
     "boundary": boundary_mutation,
     "one_point": one_point_mutation,
     "two_point": two_point_mutation
 }
+
+real_mutation_methods = {
+    "random": "random",
+    "gaussian": gaussian_mutation
+}
+
 
 experiment_results = {}
 
@@ -107,6 +123,7 @@ def fitness_func(ga_instance, solution, solution_idx):
 for selection_method in selection_methods:
     crossover_methods = binary_crossover_methods.copy() if use_binary else real_crossover_methods.copy()
     for crossover_name, crossover_strategy in crossover_methods.items():
+        mutation_methods = binary_mutation_methods if use_binary else real_mutation_methods
         for mutation_name, mutation_strategy in mutation_methods.items():
             print(f"🔍 {selection_method} | {crossover_name} | {mutation_name}")
 
@@ -125,12 +142,14 @@ for selection_method in selection_methods:
 
             solution, solution_fitness, _ = ga.best_solution()
             solution_decoded = decodeInd(solution, bits_per_var, num_vars) if use_binary else solution
-
+            fitness_history = ga.best_solutions_fitness
             key = f"{selection_method}_{crossover_name}_{mutation_name}"
             experiment_results[key] = {
                 "fitness": solution_fitness,
                 "solution": solution_decoded,
-                "fitness_history": ga.best_solutions_fitness
+                "fitness_history": fitness_history,
+                "fitness_mean": np.mean(fitness_history),
+                "fitness_std": np.std(fitness_history)
             }
 
 
@@ -155,12 +174,43 @@ for selection_method in selection_methods:
     plt.tight_layout()
     plt.show()
 
+# ===== WYKRES SŁUPKOWY — ŚREDNIA WARTOŚĆ FITNESS =====
+mean_scores = {
+    k: (1.0 / (v["fitness_mean"] + 1e-8) if is_minimum else v["fitness_mean"])
+    for k, v in experiment_results.items()
+}
+
+plt.figure(figsize=(14, 6))
+plt.bar(mean_scores.keys(), mean_scores.values(), color='skyblue')
+plt.xticks(rotation=90, fontsize=8)
+plt.ylabel("Średnia wartość funkcji celu")
+plt.title("📊 Średnia wartość funkcji celu dla każdej konfiguracji")
+plt.tight_layout()
+plt.grid(axis='y', linestyle='--', alpha=0.6)
+plt.show()
+
+# ===== WYKRES SŁUPKOWY — ODCHYLENIE STANDARDOWE =====
+std_scores = {k: v["fitness_std"] for k, v in experiment_results.items()}
+
+plt.figure(figsize=(14, 6))
+plt.bar(std_scores.keys(), std_scores.values(), color='salmon')
+plt.xticks(rotation=90, fontsize=8)
+plt.ylabel("Odchylenie standardowe wartości funkcji celu")
+plt.title("📊 Odchylenie standardowe dla każdej konfiguracji")
+plt.tight_layout()
+plt.grid(axis='y', linestyle='--', alpha=0.6)
+plt.show()
+
+
+
 # ===== Tabela wyników końcowych =====
 results_table = pd.DataFrame([
     {
         "Metoda": key,
         "Najlepszy wynik f(x)": round(data["fitness"], 8),
-        "Rozwiązanie": np.round(data["solution"], 4).tolist()
+        "Rozwiązanie": np.round(data["solution"], 4).tolist(),
+        "Średnia": round(data["fitness_mean"], 8),
+        "Odchylenie standardowe": round(data["fitness_std"], 8),
     }
     for key, data in experiment_results.items()
 ])
