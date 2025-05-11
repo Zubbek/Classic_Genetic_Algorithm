@@ -43,7 +43,11 @@ def fitnessFunction(individual, num_vars, bits_per_var, is_minimum=False):
     else:
         real_values = individual
     fitness = func(real_values)
-    return fitness + 1e-6
+
+    if is_minimum:
+        return 1.0 / (fitness + 1e-8)  # minimalizacja przez maksymalizację
+    else:
+        return fitness
 
 
 # ===== Parametry ogólne =====
@@ -116,7 +120,7 @@ for selection_method in selection_methods:
             experiment_results[key] = {
                 "fitness": solution_fitness,
                 "solution": solution_decoded,
-                "fitness_history": [1.0 / val if is_minimum else val for val in ga.best_solutions_fitness]
+                "fitness_history": ga.best_solutions_fitness
             }
 
 
@@ -127,7 +131,11 @@ for selection_method in selection_methods:
 
     for key in subset_keys:
         data = experiment_results[key]
-        plt.plot(data["fitness_history"], label=key, linewidth=1)
+        history = data["fitness_history"]
+        if is_minimum:
+            history = [1.0 / (val + 1e-8) for val in history]
+
+        plt.plot(history, label=key, linewidth=1)
 
     plt.title(f"Selekcja: {selection_method.upper()} — Porównanie krzyżowania + mutacji", fontsize=14)
     plt.xlabel("Iteracja", fontsize=12)
